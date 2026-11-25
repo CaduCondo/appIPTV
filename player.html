@@ -19,7 +19,7 @@ function say(m) { st.innerHTML = m ? '<div class="msg err">' + m.replace(/</g, '
 function back() { history.length > 1 ? history.back() : (location.href = 'home.html'); }
 document.getElementById('back').onclick = back;
 
-if (!url) say('Nenhum endereço de vídeo para reproduzir.');
+if (!url) say('Este título é só demonstração e não tem vídeo. Os da categoria "Cinema livre" e os canais de teste tocam de verdade.');
 else CL.ready.then(function () {
   var isHls = /\.m3u8(\?|$)/i.test(url);
   if (isHls && window.Hls && Hls.isSupported()) {
