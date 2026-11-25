@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark"><head><meta charset="utf-8"><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/bundle.css"><link rel="stylesheet" href="css/app.css"><script src="js/react.production.min.js"></script><script src="js/react-dom.production.min.js"></script><script src="js/bundle.js"></script><script src="js/catalog.js"></script><script src="js/app.js"></script><script src="js/demo.js"></script><title>Favoritos · Cinema Livre</title></head>
+<body><div class="page"><div id="root"></div></div>
+<script>
+if (!CL.guard(true)) throw new Error('redirect');
+var h = React.createElement, C = window.CinemaLivre, HIST = !!CL.q('h');
+function App() {
+  var s = React.useState(null), all = s[0];
+  React.useEffect(function () {
+    Promise.all([CL.loadKind('movie'), CL.loadKind('series'), CL.loadKind('live')]).then(function (r) { s[1]({ movie: r[0], series: r[1], live: r[2] }); });
+  }, []);
+  if (!all) return h('div', { className: 'msg' }, 'Carregando…');
+  var cards = [];
+  if (HIST) {
+    cards = CL.history().map(function (e) { return { t: e.t, key: e.key, x: { id: e.id, n: e.title, p: e.p }, hist: e }; });
+  } else {
+    var idx = {}; ['movie', 'series', 'live'].forEach(function (t) { idx[t] = {}; all[t].forEach(function (x) { idx[t][x.id] = x; }); });
+    cards = CL.favs().map(function (k) { var i = k.indexOf(':'), t = k.slice(0, i), id = k.slice(i + 1); return idx[t] && idx[t][id] ? { t: t, key: k, x: idx[t][id] } : null; }).filter(Boolean);
+  }
+  function open(c) {
+    if (c.hist) return (location.href = 'player.html?key=' + encodeURIComponent(c.key) + (c.t === 'live' ? '' : '&resume=1'));
+    if (c.t === 'live') { var u = CL.streamUrl('live', c.x); return (location.href = 'player.html?' + new URLSearchParams({ u: u, title: c.x.n, p: c.x.p || '', t: 'live', id: c.x.id, key: 'live:' + c.x.id })); }
+    location.href = 'detalhe.html?t=' + c.t + '&id=' + encodeURIComponent(c.x.id);
+  }
+  return h('div', null,
+    h('div', { className: 'topbar' }, h('h1', { className: 'h-title' }, HIST ? 'Histórico' : 'Favoritos'),
+      h('div', { className: 'btns' }, h(C.ActionButton, { icon: 'home', onClick: function () { location.href = 'home.html'; } }, 'Início'))),
+    cards.length === 0 ? h('div', { className: 'msg' }, HIST ? 'Nada assistido ainda neste perfil.' : 'Nenhum favorito ainda neste perfil. Abra um título e use o botão Favorito.')
+      : h('div', { className: 'grid5' }, cards.map(function (c) {
+        return h(C.PosterCard, { key: c.key, title: c.x.n, year: c.x.y || undefined, rating: c.x.r || undefined, src: c.x.p, ratio: c.t === 'live' ? '1/1' : undefined, fit: c.t === 'live' ? 'contain' : undefined, tag: c.t === 'movie' ? 'Filme' : c.t === 'series' ? 'Série' : 'Canal', onClick: function () { open(c); } });
+      })));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+CL.initNav();
+</script></body></html>

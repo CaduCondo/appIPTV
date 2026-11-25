@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark"><head><meta charset="utf-8"><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/bundle.css"><link rel="stylesheet" href="css/app.css"><script src="js/react.production.min.js"></script><script src="js/react-dom.production.min.js"></script><script src="js/bundle.js"></script><script src="js/catalog.js"></script><script src="js/app.js"></script><script src="js/demo.js"></script><title>Início · Cinema Livre</title></head>
+<body>
+<div class="page"><div id="root"></div></div>
+<script>
+if (!CL.guard(true)) throw new Error('redirect');
+var h = React.createElement, C = window.CinemaLivre;
+var meta = CL.meta(), prof = CL.profile(), counts = meta.counts || {};
+
+function goItem(t, x) { location.href = 'detalhe.html?t=' + t + '&id=' + encodeURIComponent(x.id); }
+function Wide(props) {
+  var x = props.x;
+  return h('button', { type: 'button', className: 'wide-card', onClick: props.onClick },
+    x.p ? h('img', { src: x.p, alt: '', loading: 'lazy', onError: function (e) { e.target.style.display = 'none'; } }) : null,
+    h('span', { className: 'kind' }, props.kind),
+    h('span', { className: 'cap' }, props.title || x.n),
+    props.progress ? h('span', { className: 'bar', style: { width: props.progress + '%' } }) : null);
+}
+function App() {
+  var s = React.useState(new Date()); var now = s[0];
+  React.useEffect(function () { var i = setInterval(function () { s[1](new Date()); }, 30000); return function () { clearInterval(i); }; }, []);
+  var hist = CL.history().slice(0, 12);
+  var recent = [].concat((meta.recent && meta.recent.movie || []).slice(0, 8).map(function (x) { return { t: 'movie', x: x }; }), (meta.recent && meta.recent.series || []).slice(0, 8).map(function (x) { return { t: 'series', x: x }; })).sort(function (a, b) { return (b.x.a || 0) - (a.x.a || 0); }).slice(0, 12);
+  var favN = CL.favs().length;
+  var status = meta.exp ? (meta.exp * 1000 < Date.now() ? 'Lista vencida em ' + CL.fmtDate(meta.exp) : 'Lista válida até ' + CL.fmtDate(meta.exp)) : (meta.kind === 'demo' ? 'Modo demonstração' : 'Lista importada');
+
+  return h('div', null,
+    h('div', { className: 'topbar' },
+      h('div', { className: 'brand-mark' }, 'Cinema ', h('b', null, 'Livre')),
+      h('div', { className: 'muted', style: { font: '600 20px/26px var(--font-sans)' } }, now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })),
+      h('div', { className: 'btns' },
+        h(C.ActionButton, { icon: 'refresh', onClick: function () { location.href = 'contas.html?recarregar=1'; } }, 'Recarregar'),
+        h(C.ActionButton, { icon: 'settings', onClick: function () { location.href = 'embreve.html?t=Ajustes'; } }, 'Ajustes'),
+        h(C.ProfileItem, { name: prof.name, color: prof.color, onClick: function () { location.href = 'perfis.html'; } }))),
+    h('div', { className: 'hello' },
+      h('div', { style: { flex: 1 } }, h('div', { className: 't' }, CL.greeting() + ', ' + prof.name + '!'), h('div', { className: 'muted', style: { font: '500 18px/26px var(--font-sans)' } }, 'Escolha uma seção para começar a assistir.')),
+      h('span', { className: 'cl-chip' }, status)),
+
+    hist.length > 0 && h('div', null, h('div', { className: 'sec-label' }, 'Continuar assistindo'),
+      h('div', { className: 'row-scroll' }, hist.map(function (e) {
+        return h(Wide, { key: e.key, x: { p: e.p, n: e.title }, kind: e.t === 'movie' ? 'Filme' : e.t === 'series' ? 'Série' : 'Canal', progress: e.dur ? Math.round(e.pos / e.dur * 100) : 0, title: e.title,
+          onClick: function () { location.href = e.t === 'live' ? 'player.html?key=' + encodeURIComponent(e.key) : 'player.html?key=' + encodeURIComponent(e.key) + '&resume=1'; } });
+      }))),
+
+    recent.length > 0 && h('div', null, h('div', { className: 'sec-label' }, 'Adicionados recentemente'),
+      h('div', { className: 'row-scroll' }, recent.map(function (r) {
+        return h(Wide, { key: r.t + r.x.id, x: r.x, kind: r.t === 'movie' ? 'Filme' : 'Série', onClick: function () { goItem(r.t, r.x); } });
+      }))),
+
+    h('div', { className: 'sec-label' }, 'Jogos do dia'),
+    h('div', { className: 'soon' }, h(C.Icon, { name: 'live', size: 24 }), 'Em breve: placares e transmissões dos jogos do dia.'),
+
+    h('div', { className: 'hub' },
+      h(C.HubTile, { big: true, icon: 'live', title: 'TV ao Vivo', subtitle: CL.num(counts.live) + ' canais', onClick: function () { location.href = 'tv.html'; } }),
+      h(C.HubTile, { icon: 'film', title: 'Filmes', subtitle: CL.num(counts.movie) + ' títulos', onClick: function () { location.href = 'filmes.html'; } }),
+      h(C.HubTile, { icon: 'series', title: 'Séries', subtitle: CL.num(counts.series) + ' séries', onClick: function () { location.href = 'series.html'; } }),
+      h(C.HubTile, { icon: 'heart', title: 'Favoritos', subtitle: favN + (favN === 1 ? ' item' : ' itens'), onClick: function () { location.href = 'favoritos.html'; } }),
+      h(C.HubTile, { icon: 'user', title: 'Contas', subtitle: 'Suas listas', onClick: function () { location.href = 'contas.html'; } }),
+      h(C.HubTile, { icon: 'history', title: 'Histórico', subtitle: CL.history().length + ' itens', onClick: function () { location.href = 'favoritos.html?h=1'; } }),
+      h(C.HubTile, { icon: 'settings', title: 'Ajustes', subtitle: 'Preferências', onClick: function () { location.href = 'embreve.html?t=Ajustes'; } }))
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+CL.initNav();
+</script></body></html>

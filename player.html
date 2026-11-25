@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark"><head><meta charset="utf-8"><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/bundle.css"><link rel="stylesheet" href="css/app.css"><script src="js/react.production.min.js"></script><script src="js/react-dom.production.min.js"></script><script src="js/bundle.js"></script><script src="js/catalog.js"></script><script src="js/app.js"></script><script src="js/demo.js"></script><script src="js/hls.min.js"></script><title>Reproduzindo · Cinema Livre</title></head>
+<body class="player">
+<video id="v" controls autoplay playsinline></video>
+<div class="overlay" id="ov"><button class="cl-btn" id="back" type="button">‹ Voltar</button><span id="ttl"></span></div>
+<div class="status" id="st"></div>
+<script>
+if (!CL.guard(true)) throw new Error('redirect');
+var q = new URLSearchParams(location.search), entry = null;
+if (q.get('key') && !q.get('u')) {
+  entry = CL.history().filter(function (e) { return e.key === q.get('key'); })[0];
+  if (entry) q = new URLSearchParams({ u: entry.u || '', title: entry.title, p: entry.p || '', t: entry.t, id: entry.id, key: entry.key, resume: q.get('resume') || '', s: entry.ep ? entry.ep.s : '', n: entry.ep ? entry.ep.n : '', eid: entry.ep ? entry.ep.eid : '' });
+}
+var url = q.get('u'), title = q.get('title') || '', type = q.get('t') || 'movie', key = q.get('key');
+var v = document.getElementById('v'), ov = document.getElementById('ov'), st = document.getElementById('st');
+document.getElementById('ttl').textContent = title;
+document.title = title + ' · Cinema Livre';
+function say(m) { st.innerHTML = m ? '<div class="msg err">' + m.replace(/</g, '&lt;') + '</div>' : ''; }
+function back() { history.length > 1 ? history.back() : (location.href = 'home.html'); }
+document.getElementById('back').onclick = back;
+
+if (!url) say('Nenhum endereço de vídeo para reproduzir.');
+else CL.ready.then(function () {
+  var isHls = /\.m3u8(\?|$)/i.test(url);
+  if (isHls && window.Hls && Hls.isSupported()) {
+    var src = CL.hasProxy ? '/proxy?url=' + encodeURIComponent(url) : url;
+    var hls = new Hls({ maxBufferLength: 30 });
+    hls.loadSource(src); hls.attachMedia(v);
+    hls.on(Hls.Events.ERROR, function (e, d) { if (d.fatal) say('Não foi possível carregar o canal. Pode estar fora do ar, ou o navegador bloqueou o acesso (use o iniciar.bat).'); });
+  } else v.src = url;
+  v.addEventListener('error', function () { say('Não foi possível reproduzir este vídeo. O formato (por exemplo .mkv ou .ts) pode não ser suportado pelo navegador, ou o servidor recusou o acesso.'); });
+  v.addEventListener('loadedmetadata', function () {
+    var h = CL.get('p.' + (CL.profile() || {}).id + '.hist', {})[key];
+    if (q.get('resume') && h && h.pos > 5 && h.dur && h.pos < h.dur - 10 && type !== 'live') v.currentTime = h.pos;
+  });
+  var last = 0;
+  function save() {
+    if (!key || type === 'live') { if (key) CL.saveProgress({ key: key, t: type, id: q.get('id'), title: title, p: q.get('p'), u: url, pos: 0, dur: 0 }); return; }
+    if (!(v.duration > 0)) return;
+    CL.saveProgress({ key: key, t: type, id: q.get('id'), title: title, p: q.get('p'), u: url, pos: v.currentTime, dur: v.duration, ep: q.get('eid') ? { s: q.get('s'), n: q.get('n'), eid: q.get('eid') } : undefined });
+  }
+  v.addEventListener('timeupdate', function () { var n = Date.now(); if (n - last > 5000) { last = n; save(); } });
+  v.addEventListener('pause', save);
+  window.addEventListener('pagehide', save);
+  if (type === 'live') save();
+});
+
+/* overlay some depois de 3s; teclas de atalho */
+var tm; function wake() { ov.classList.remove('fade'); clearTimeout(tm); tm = setTimeout(function () { if (!v.paused) ov.classList.add('fade'); }, 3000); }
+['mousemove', 'keydown', 'click'].forEach(function (e) { document.addEventListener(e, wake); }); wake();
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' || e.key === 'Backspace') return back();
+  if (e.key === 'Enter' || e.key === ' ') { if (document.activeElement && document.activeElement.id === 'back') return; e.preventDefault(); v.paused ? v.play() : v.pause(); }
+  if (type !== 'live' && e.key === 'ArrowRight') v.currentTime += 10;
+  if (type !== 'live' && e.key === 'ArrowLeft') v.currentTime -= 10;
+});
+</script></body></html>

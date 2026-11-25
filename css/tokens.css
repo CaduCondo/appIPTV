@@ -1,0 +1,57 @@
+/* Cinema Livre — generated from tokens.json */
+:root, [data-theme="dark"] {
+  --surface-100: #0e1116;
+  --surface-200: #161b22;
+  --surface-300: #212833;
+  --line: #3a4452;
+  --line-strong: #7b8797;
+  --ink: #f2f4f7;
+  --ink-muted: #a9b2bf;
+  --brand: #2dd4bf;
+  --on-brand: #04201c;
+  --accent: #fbbf24;
+  --on-accent: #231a00;
+  --rating-bg: #0b0d10d9;
+  --rating-ink: #fbbf24;
+  --on-scrim: #f2f4f7;
+  --danger: #ff8a7a;
+  --focus: #5eead4;
+  --shadow-poster: 0 10px 24px #00000066;
+}
+[data-theme="light"] {
+  --surface-100: #f6f3ee;
+  --surface-200: #ffffff;
+  --surface-300: #ebe6dd;
+  --line: #d9d2c5;
+  --line-strong: #7a7266;
+  --ink: #17202a;
+  --ink-muted: #4d5866;
+  --brand: #0f766e;
+  --on-brand: #ffffff;
+  --accent: #f59e0b;
+  --on-accent: #231a00;
+  --rating-bg: #0b0d10d9;
+  --rating-ink: #fbbf24;
+  --on-scrim: #f2f4f7;
+  --danger: #b42318;
+  --focus: #0b4f49;
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+  --still-w: 280px;
+  --avatar: 76px;
+  --sidebar-w: 300px;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-sans: "Figtree", "Segoe UI", system-ui, sans-serif;
+}

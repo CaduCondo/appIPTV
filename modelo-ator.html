@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark"><head><meta charset="utf-8"><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/bundle.css"><link rel="stylesheet" href="css/app.css"><script src="js/react.production.min.js"></script><script src="js/react-dom.production.min.js"></script><script src="js/bundle.js"></script><title>Modelo · Tela de ator</title><style>
+body{margin:0;background:var(--surface-100);color:var(--ink);font-family:var(--font-sans)}
+.screen{box-sizing:border-box;width:1280px;height:720px;padding:32px;overflow:hidden}
+.top{display:grid;grid-template-columns:200px 1fr;column-gap:32px;align-items:start}
+.photo{aspect-ratio:4/5;border-radius:var(--radius-md);overflow:hidden;background:var(--surface-300);box-shadow:var(--shadow-poster)}
+.photo img{object-position:50% 20%}
+h1{margin:0 0 12px;font:700 56px/60px var(--font-display)}
+p.bio{margin:16px 0;font:400 20px/30px var(--font-sans);max-width:900px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.btns{display:flex;gap:8px}
+h2{margin:32px 0 8px;font:600 28px/34px var(--font-display)}
+.row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0 8px}
+</style><style>.screen{height:auto!important;min-height:720px;overflow:visible!important}</style></head><body><div id="root"></div>
+<script>
+var h=React.createElement,C=window.CinemaLivre;
+var bio='Edward Thomas "Tom" Hardy (Hammersmith, Londres, 15 de setembro de 1977) é um ator, produtor e roteirista britânico conhecido pelos seus papéis em filmes como A Origem, Batman: O Cavaleiro das Trevas Ressurge, Mad Max: Estrada da Fúria e Venom, e também na série Peaky Blinders. Em 2016 foi indicado ao Óscar de melhor ator coadjuvante pelo filme O Regresso.';
+var films=[
+ ['A Origem','2010 · Eames',8.8,'assets/Demo/inception.jpg'],
+ ['Batman: O Cavaleiro das Trevas Ressurge','2012 · Bane',8.4,'assets/Demo/batman-cavaleiro-das-trevas-ressurge.jpg'],
+ ['Mad Max: Estrada da Fúria','2015 · Max Rockatansky',8.1,'assets/Demo/mad-max-estrada-da-furia.jpg'],
+ ['Homem-Aranha: Sem Volta para Casa','2021 · Eddie Brock',8.2,'assets/Demo/homem-aranha-sem-volta-para-casa.jpg'],
+ ['O Regresso','2015 · John Fitzgerald',8.0,'assets/Demo/o-regresso.jpg'],
+ ['Dunkirk','2017 · Farrier',7.8,'assets/Demo/dunkirk.jpg'],
+ ['Venom','2018 · Eddie Brock',6.6,'assets/Demo/venom.png']
+];
+ReactDOM.createRoot(document.getElementById('root')).render(
+  h('div',{className:'screen'},
+    h('div',{className:'top'},
+      h('div',{className:'photo'},h('img',{className:'cl-art',src:'assets/Pessoas/tom-hardy.jpg',alt:'Foto de Tom Hardy'})),
+      h('div',null,
+        h('h1',null,'Tom Hardy'),
+        h(C.MetaChips,{genres:['Ator / Atriz','15/09/1977','Hammersmith, Londres, Inglaterra']}),
+        h('p',{className:'bio'},bio),
+        h('div',{className:'btns'},
+          h(C.ActionButton,{icon:'speaker'},'Ouvir biografia'),
+          h(C.ActionButton,{icon:'back',onClick:function(){history.back()}},'Voltar'),
+          h(C.ActionButton,{icon:'home',onClick:function(){location.href='home.html'}},'Início')
+        )
+      )
+    ),
+    h('h2',null,'36 títulos na sua lista'),
+    h('div',{className:'row'},films.map(function(f,i){
+      return h(C.PosterCard,{key:i,title:f[0],meta:f[1],rating:f[2],src:''+f[3],tag:'Na lista'});
+    }))
+  )
+);
+</script><script>function fit(){var e=document.querySelector(".screen");e.style.zoom=Math.min(1,innerWidth/1280)}addEventListener("resize",fit);addEventListener("load",fit)</script></body></html>

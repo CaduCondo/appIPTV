@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark"><head><meta charset="utf-8"><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/bundle.css"><link rel="stylesheet" href="css/app.css"><script src="js/react.production.min.js"></script><script src="js/react-dom.production.min.js"></script><script src="js/bundle.js"></script><script src="js/catalog.js"></script><script src="js/app.js"></script><script src="js/demo.js"></script><title>Contas · Cinema Livre</title></head>
+<body><div class="page"><div id="root"></div></div>
+<script>
+if (!CL.guard(false)) throw new Error('redirect');
+var h = React.createElement, C = window.CinemaLivre;
+function App() {
+  var s = React.useState({ busy: false, msg: '', err: '' }), st = s[0];
+  function patch(p) { s[1](function (o) { return Object.assign({}, o, p); }); }
+  var m = CL.meta() || {};
+  function reload() {
+    if (st.busy) return;
+    patch({ busy: true, err: '', msg: 'Atualizando…' });
+    CL.reload(function (t) { patch({ msg: t }); }).then(function () { patch({ busy: false, msg: 'Lista atualizada.' }); setTimeout(function () { location.href = CL.profile() ? 'home.html' : 'perfis.html'; }, 600); })
+      .catch(function (e) { patch({ busy: false, msg: '', err: CL.netError(e) }); });
+  }
+  React.useEffect(function () { if (CL.q('recarregar') && m.kind === 'xtream') reload(); else if (CL.q('recarregar')) patch({ msg: 'Esta lista veio de um arquivo ou da demonstração. Importe de novo para atualizar.' }); }, []);
+  var rows = [
+    ['Tipo', m.kind === 'xtream' ? 'Usuário e senha (Xtream)' : m.kind === 'm3u' ? 'Lista M3U' : 'Demonstração'],
+    m.kind === 'xtream' && ['Servidor', m.server],
+    m.kind === 'xtream' && ['Usuário', m.user],
+    m.status && ['Situação', m.status],
+    m.exp && ['Vencimento', CL.fmtDate(m.exp)],
+    ['Conteúdo', CL.num((m.counts || {}).movie) + ' filmes · ' + CL.num((m.counts || {}).series) + ' séries · ' + CL.num((m.counts || {}).live) + ' canais'],
+    m.updated && ['Atualizada em', new Date(m.updated).toLocaleString('pt-BR')],
+    ['Código do aparelho', CL.deviceCode()]
+  ].filter(Boolean);
+  return h('div', null,
+    h('div', { className: 'topbar' }, h('h1', { className: 'h-title' }, 'Contas'), h('div', { className: 'btns' }, h(C.ActionButton, { icon: 'home', onClick: function () { location.href = CL.profile() ? 'home.html' : 'perfis.html'; } }, 'Início'))),
+    h('div', { className: 'hello', style: { flexDirection: 'column', alignItems: 'stretch', maxWidth: 760, gap: 10 } },
+      rows.map(function (r) { return h('div', { key: r[0], style: { display: 'flex', gap: 16 } }, h('span', { className: 'muted', style: { width: 180, font: '600 16px/22px var(--font-sans)' } }, r[0]), h('span', { style: { font: '500 18px/24px var(--font-sans)', wordBreak: 'break-all' } }, r[1])); })),
+    h('div', { style: { margin: '16px 0', maxWidth: 760 } }, st.err && h('div', { className: 'msg err' }, st.err), st.msg && !st.err && h('div', { className: 'msg' }, st.msg)),
+    h('div', { className: 'btns' },
+      h(C.ActionButton, { variant: 'primary', icon: 'refresh', onClick: reload }, 'Atualizar lista'),
+      h(C.ActionButton, { icon: 'plus', onClick: function () { location.href = 'login.html?trocar=1'; } }, 'Trocar lista'),
+      h(C.ActionButton, { icon: 'user', onClick: function () { location.href = 'perfis.html'; } }, 'Trocar perfil'),
+      h(C.ActionButton, { icon: 'logout', onClick: function () { if (confirm('Sair e apagar a lista deste aparelho? Os perfis e favoritos continuam salvos.')) CL.signOut().then(function () { location.href = 'login.html'; }); } }, 'Sair e apagar a lista')));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+CL.initNav();
+</script></body></html>

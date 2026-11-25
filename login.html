@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark"><head><meta charset="utf-8"><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/bundle.css"><link rel="stylesheet" href="css/app.css"><script src="js/react.production.min.js"></script><script src="js/react-dom.production.min.js"></script><script src="js/bundle.js"></script><script src="js/catalog.js"></script><script src="js/app.js"></script><script src="js/demo.js"></script><title>Entrar · Cinema Livre</title></head>
+<body>
+<div class="stage" id="stage"><div class="stage__bg" id="bg"></div><div class="page"><div id="root"></div></div></div>
+<div class="devcode">Código do aparelho: <b id="dev"></b></div>
+<script>
+var h = React.createElement, C = window.CinemaLivre;
+var shots = ['inception','batman-cavaleiro-das-trevas-ressurge','mad-max-estrada-da-furia','o-regresso','dunkirk','homem-aranha-sem-volta-para-casa','terra-da-mafia','sintel','tears-of-steel','big-buck-bunny','elephants-dream','wet-hot-american-summer','haters-back-off','venom'];
+var ext = { 'tears-of-steel': 'png', 'haters-back-off': 'png', 'venom': 'png' };
+document.getElementById('bg').innerHTML = shots.concat(shots.slice(0, 4)).map(function (s) { return '<img alt="" src="assets/Demo/' + s + '.' + (ext[s] || 'jpg') + '">'; }).join('');
+document.getElementById('dev').textContent = CL.deviceCode();
+
+function App() {
+  var s = React.useState({ tab: 'xtream', server: '', user: '', pass: '', url: '', text: '', busy: false, status: '', error: '' });
+  var st = s[0];
+  function set(p) { s[1](Object.assign({}, st, p)); }
+  function patch(p) { s[1](function (o) { return Object.assign({}, o, p); }); }
+
+  function finish(data) {
+    return CL.saveCatalog(data).then(function () { location.href = CL.profiles().length ? 'perfis.html' : 'perfis.html?novo=1'; });
+  }
+  function run(fn) {
+    patch({ busy: true, error: '', status: 'Conectando…' });
+    fn(function (m) { patch({ status: m }); })
+      .then(function (data) {
+        if (!data.movie.length && !data.series.length && !data.live.length) throw new Error('inválida: A lista está vazia.');
+        patch({ status: 'Salvando ' + CL.num(data.movie.length + data.series.length + data.live.length) + ' itens…' });
+        return finish(data);
+      })
+      .catch(function (e) { patch({ busy: false, status: '', error: CL.netError(e) }); });
+  }
+  function submit() {
+    if (st.busy) return;
+    if (st.tab === 'xtream') {
+      if (!st.server.trim() || !st.user.trim() || !st.pass) return set({ error: 'Preencha servidor, usuário e senha.' });
+      run(function (say) { return CL.importXtream(st.server, st.user.trim(), st.pass, say); });
+    } else if (st.tab === 'url') {
+      if (!st.url.trim()) return set({ error: 'Cole o link da lista.' });
+      run(function (say) { return CL.importUrl(st.url, say); });
+    } else {
+      if (st.text.indexOf('#EXTINF') < 0) return set({ error: 'Escolha um arquivo .m3u ou cole o conteúdo da lista.' });
+      run(function (say) { say('Lendo a lista…'); return Promise.resolve(CL.parseM3U(st.text, 'Lista importada')); });
+    }
+  }
+  function onKey(e) { if (e.key === 'Enter') submit(); }
+  function pickFile(e) {
+    var f = e.target.files && e.target.files[0]; if (!f) return;
+    var r = new FileReader(); r.onload = function () { patch({ text: String(r.result), error: '', status: f.name + ' carregado.' }); }; r.readAsText(f);
+  }
+  function tab(id, label) { return h(C.ActionButton, { key: id, variant: st.tab === id ? 'primary' : 'secondary', onClick: function () { set({ tab: id, error: '' }); } }, label); }
+
+  var form;
+  if (st.tab === 'xtream') form = [
+    h(C.Field, { key: 's', label: 'Servidor', placeholder: 'http://servidor.exemplo:8080', value: st.server, onChange: function (v) { set({ server: v }); }, onKeyDown: onKey, autoFocus: true }),
+    h(C.Field, { key: 'u', label: 'Usuário', value: st.user, onChange: function (v) { set({ user: v }); }, onKeyDown: onKey }),
+    h(C.Field, { key: 'p', label: 'Senha', type: 'password', value: st.pass, onChange: function (v) { set({ pass: v }); }, onKeyDown: onKey })
+  ];
+  else if (st.tab === 'url') form = [h(C.Field, { key: 'l', label: 'Link da lista (M3U)', placeholder: 'http://…/get.php?username=…&password=…&type=m3u_plus', value: st.url, onChange: function (v) { set({ url: v }); }, onKeyDown: onKey, autoFocus: true, hint: 'Links de provedor com usuário e senha usam o modo completo (filmes, séries e canais separados).' })];
+  else form = [
+    h('label', { key: 'f', className: 'cl-field' }, h('span', { className: 'cl-field__label' }, 'Arquivo da lista (.m3u)'), h('input', { type: 'file', accept: '.m3u,.m3u8,.txt', onChange: pickFile, className: 'cl-field__input' })),
+    h('label', { key: 't', className: 'cl-field' }, h('span', { className: 'cl-field__label' }, 'ou cole o conteúdo'), h('textarea', { className: 'cl-field__input', value: st.text, onChange: function (e) { set({ text: e.target.value }); } }))
+  ];
+
+  return h('div', null,
+    h('div', { className: 'brand-mark' }, 'Cinema ', h('b', null, 'Livre')),
+    h('h1', { className: 'h-title', style: { marginTop: 40 } }, 'Entrar'),
+    h('p', { className: 'muted', style: { font: '500 18px/26px var(--font-sans)', maxWidth: 460 } }, 'Importe a sua lista para liberar filmes, séries e canais. Depois você escolhe o seu perfil.'),
+    h('div', { className: 'tabs' }, tab('xtream', 'Usuário e senha'), tab('url', 'Link M3U'), tab('file', 'Arquivo')),
+    h('div', { className: 'form' },
+      form,
+      st.error && h('div', { className: 'msg err', role: 'alert' }, st.error),
+      st.status && !st.error && h('div', { className: 'msg', role: 'status' }, st.status),
+      h('div', { className: 'btns' },
+        h(C.ActionButton, { variant: 'primary', icon: 'check', onClick: submit }, st.busy ? 'Importando…' : 'Entrar'),
+        h(C.ActionButton, { icon: 'play', onClick: function () { if (st.busy) return; run(function (say) { say('Preparando a demonstração…'); return Promise.resolve(CL.demoCatalog()); }); } }, 'Ver demonstração')
+      )
+    )
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+CL.initNav();
+if (CL.hasList() && !CL.q('trocar')) location.replace('perfis.html');
+</script></body></html>
