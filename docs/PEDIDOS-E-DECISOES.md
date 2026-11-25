@@ -22,3 +22,8 @@ Registro do que foi pedido e decidido, em ordem. O Claude atualiza este arquivo 
 - O Claude desenvolve o ciclo todo: issue no GitHub, kanban, código, testes unitários e funcionais (Robot Framework com Python), CI no GitHub Actions, análise do resultado, issue para defeito do sistema com gravidade, backlog ordenado por importância e risco, e recomeça com a próxima issue. Tudo documentado.
 - O Cadu não é programador: tudo explicado em linguagem simples.
 - Links de referência que o Cadu achou: megacubo.tv (guia de lista IPTV), noticiasdoes.com.br, dicas.zone, lumi.new (IA que gera players IPTV). Lista a assinar: growthtech.com.br (depois do app pronto).
+
+## 25/nov/2026 — navegar na demonstração
+
+- Cadu quer abrir e navegar pelo app, mesmo com conteúdo mockado, para ir ajustando o visual. Decisão: demonstração publicada no GitHub Pages (https://caducondo.github.io/appIPTV/) e catálogo de exemplo maior (issue #17).
+- Cadu quer respostas curtas e diretas, só com o importante e as decisões dele (issue #16, regra no `CLAUDE.md`).

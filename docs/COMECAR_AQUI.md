@@ -1,6 +1,10 @@
 # Começar aqui (passo a passo para quem não programa)
 
-## 1. Rodar o app no seu computador
+## 0. Só quero navegar (sem instalar nada)
+
+Abra https://caducondo.github.io/appIPTV/ no navegador (computador, celular ou TV) e toque em **Ver demonstração**. Tudo é conteúdo de exemplo. Perfis, favoritos e histórico ficam salvos naquele aparelho.
+
+## 1. Rodar o app no seu computador (para importar uma lista de verdade)
 
 1. Instale o **Python**: https://www.python.org/downloads/ → baixe, abra o instalador, **marque a caixinha "Add python.exe to PATH"** e clique em Install.
 2. Abra a pasta `C:\Users\debor\Documents\automacao\projetoIPTV`.
