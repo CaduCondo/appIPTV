@@ -9,7 +9,7 @@
   function open(x) {
     if (KIND === 'live') {
       var u = CL.streamUrl('live', x);
-      if (!u) return alert('Este canal não tem endereço de reprodução.');
+      if (!u) return alert('Este é um canal de exemplo e não tem transmissão. Os canais de teste da categoria "Canais de teste" tocam de verdade.');
       location.href = 'player.html?' + new URLSearchParams({ u: u, title: x.n, p: x.p || '', t: 'live', id: x.id, key: 'live:' + x.id });
     } else location.href = 'detalhe.html?t=' + KIND + '&id=' + encodeURIComponent(x.id);
   }

@@ -6,6 +6,9 @@
 if (!CL.guard(true)) throw new Error('redirect');
 var h = React.createElement, C = window.CinemaLivre;
 var meta = CL.meta(), prof = CL.profile(), counts = meta.counts || {};
+var DEMO = meta.kind === 'demo';
+if (DEMO && CL.seedDemoHistory) CL.seedDemoHistory();
+var GAMES = [['Campeonato de Exemplo', 'Atlético Norte', 2, 'Real Sul', 1, 'Encerrado'], ['Copa de Exemplo', 'União FC', 0, 'Porto Azul', 0, 'Ao vivo · 62\''], ['Campeonato de Exemplo', 'Estrela do Vale', '', 'Nacional EC', '', 'Hoje · 20:30'], ['Liga de Exemplo', 'Costa Verde', '', 'Montanha FC', '', 'Hoje · 22:00']];
 
 function goItem(t, x) { location.href = 'detalhe.html?t=' + t + '&id=' + encodeURIComponent(x.id); }
 function Wide(props) {
@@ -47,8 +50,13 @@ function App() {
         return h(Wide, { key: r.t + r.x.id, x: r.x, kind: r.t === 'movie' ? 'Filme' : 'Série', onClick: function () { goItem(r.t, r.x); } });
       }))),
 
-    h('div', { className: 'sec-label' }, 'Jogos do dia'),
-    h('div', { className: 'soon' }, h(C.Icon, { name: 'live', size: 24 }), 'Em breve: placares e transmissões dos jogos do dia.'),
+    h('div', { className: 'sec-label' }, 'Jogos do dia', DEMO && h('span', { className: 'badge-demo', style: { marginLeft: 10 } }, 'Exemplo')),
+    DEMO ? h('div', { className: 'row-scroll' }, GAMES.map(function (g, i) {
+      return h('button', { key: i, type: 'button', className: 'match', onClick: function () { location.href = 'embreve.html?t=Jogos do dia'; } },
+        h('span', { className: 'match__league' }, g[0]),
+        h('span', { className: 'match__teams' }, h('b', null, g[1]), h('span', { className: 'match__score' }, g[2] === '' ? 'x' : g[2] + ' x ' + g[4]), h('b', null, g[3])),
+        h('span', { className: 'match__status' }, g[5]));
+    })) : h('div', { className: 'soon' }, h(C.Icon, { name: 'live', size: 24 }), 'Em breve: placares e transmissões dos jogos do dia.'),
 
     h('div', { className: 'hub' },
       h(C.HubTile, { big: true, icon: 'live', title: 'TV ao Vivo', subtitle: CL.num(counts.live) + ' canais', onClick: function () { location.href = 'tv.html'; } }),

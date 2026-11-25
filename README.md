@@ -4,6 +4,10 @@ App para assistir **filmes, séries e TV ao vivo** a partir de uma lista que voc
 
 > Os pôsteres e fotos da pasta `assets/` são só de demonstração. Nenhuma lista, usuário ou senha de provedor deve ser colocado neste repositório.
 
+## Demonstração online (sem instalar nada)
+
+https://caducondo.github.io/appIPTV/ — abra, toque em **Ver demonstração** e navegue. Conteúdo de exemplo; os filmes da categoria "Cinema livre" tocam de verdade. A importação de listas de provedor precisa do `iniciar.bat` (abaixo).
+
 ## Como rodar (Windows)
 
 1. Instale o Python (https://www.python.org/downloads/, marcando **Add python.exe to PATH**).

@@ -34,6 +34,14 @@ Que entrei com a lista de teste e o perfil "${nome}"
     App.Clicar No Botao    Salvar
     App.Esperar Pagina    home.html
 
+Que entrei pela demonstração com o perfil "${nome}"
+    App.Abrir Pagina    /login.html
+    App.Clicar No Botao    Ver demonstração
+    App.Esperar Pagina    perfis.html
+    App.Preencher Campo    0    ${nome}
+    App.Clicar No Botao    Salvar
+    App.Esperar Pagina    home.html
+
 # ---------- Quando ----------
 Preencho servidor, usuário "${usuario}" e senha "${senha}"
     ${srv}=    App.Provedor Url
@@ -88,6 +96,11 @@ Não vejo o texto "${texto}"
 Vejo ${n} pôsteres
     ${c}=    App.Contar Elementos    .cl-poster
     Should Be Equal As Integers    ${c}    ${n}
+
+Vejo pelo menos ${n} pôsteres
+    App.Esperar Elementos    .cl-poster
+    ${c}=    App.Contar Elementos    .cl-poster
+    Should Be True    ${c} >= ${n}
 
 Vejo ${n} episódios
     ${c}=    App.Contar Elementos    .cl-ep
