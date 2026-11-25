@@ -3,8 +3,15 @@
 ## Sobre o usuário
 
 - Cadu — trabalha como QA, **não é desenvolvedor**. Precisa de explicações simples, passo a passo, sem pular etapas e sem "tecnês". Se precisar citar algo técnico, traduzir o impacto em termos do dia a dia do app.
-- Respostas curtas e diretas. Explicar o que vai mudar ANTES de mudar e o que foi feito DEPOIS.
 - Esse padrão de trabalho é o mesmo dos outros projetos dele (Sistema D'Uvo Enterprise, Dashboard Auto Casa, Projeto Orçamento). Este arquivo foi montado a partir deles.
+
+## Como responder ao Cadu (regra dele, 25/nov/2026 — vale sempre)
+
+- **Resposta curta e direta.** Só o mais importante: o que ficou pronto e como ele abre/vê, e **principalmente** as dúvidas ou decisões que dependem dele (em uma pergunta objetiva cada).
+- Sem relatório longo: nada de listar tudo que foi feito, tabelas, histórico de tentativas ou explicações que ele não pediu. Se ele quiser detalhe, pede.
+- Explicar o que vai mudar ANTES só quando houver risco ou decisão; o resto vai direto ao resultado.
+- Passo a passo só quando ele precisar executar algo, e curto.
+- O detalhe completo fica nos lugares certos (issue, PR, `docs/`), não na resposta.
 
 ## O projeto
 
