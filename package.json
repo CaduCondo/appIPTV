@@ -1,0 +1,12 @@
+{
+  "name": "cinema-livre",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cinema Livre: app de filmes, séries e TV ao vivo a partir de uma lista (M3U ou Xtream).",
+  "scripts": {
+    "start": "python servidor.py",
+    "test:unit": "node --test tests/unit/*.test.js",
+    "test:bdd": "python -m robot --outputdir results/robot tests/robot/features",
+    "test": "npm run test:unit && npm run test:bdd"
+  }
+}
