@@ -1,5 +1,5 @@
 /**
- * Cinema Livre — SERVIÇO DE LOGIN E USUÁRIOS.
+ * CineHomeTV — SERVIÇO DE LOGIN E USUÁRIOS.
  *
  * HOJE usa dados de TESTE guardados no navegador (para o Cadu navegar e para os
  * testes rodarem sem banco). DEPOIS troca para o Supabase (issue #22) sem mudar

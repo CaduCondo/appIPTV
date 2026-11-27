@@ -1,4 +1,4 @@
-/* Cinema Livre — núcleo do app: armazenamento, importação de listas, perfis, histórico, navegação. */
+/* CineHomeTV — núcleo do app: armazenamento, importação de listas, perfis, histórico, navegação. */
 (function () {
   var CL = (window.CL = {});
   var LS = window.localStorage;

@@ -15,9 +15,9 @@
 
 ## O projeto
 
-- **Cinema Livre**: app para assistir filmes, séries e TV ao vivo a partir de uma **lista** que o usuário importa (painel Xtream com usuário e senha, link M3U ou arquivo .m3u). Feito primeiro para TV (controle remoto), mas funciona no navegador.
+- **CineHomeTV**: app para assistir filmes, séries e TV ao vivo a partir de uma **lista** que o usuário importa (painel Xtream com usuário e senha, link M3U ou arquivo .m3u). Feito primeiro para TV (controle remoto), mas funciona no navegador.
 - Telas prontas: entrar (usuário e senha numéricos, teclado para controle remoto), criar usuário (só administrador), esqueci minha senha, importar lista (só administrador), perfis, home (hub), listagem de Filmes/Séries/TV ao Vivo (categorias à esquerda, pôsteres à direita), detalhe de filme/série (elenco, temporadas, episódios), player, favoritos/histórico, contas. A tela de ator é só um modelo estático (`modelo-ator.html`).
-- Stack hoje: HTML + JavaScript puro + React (arquivos locais em `js/`, sem build), componentes em `js/bundle.js`/`css/bundle.css` (design system "Cinema Livre"), dados no navegador (localStorage + IndexedDB). `servidor.py` serve o app e faz o proxy `/proxy?url=` (evita o bloqueio CORS dos provedores).
+- Stack hoje: HTML + JavaScript puro + React (arquivos locais em `js/`, sem build), componentes em `js/bundle.js`/`css/bundle.css` (design system "CineHomeTV"), dados no navegador (localStorage + IndexedDB). `servidor.py` serve o app e faz o proxy `/proxy?url=` (evita o bloqueio CORS dos provedores).
 - Design system: https://claude.ai/artifact/L9nrpLdS1CPqMBYFFa9MDV (tokens, componentes, 3 telas de exemplo). O que mudar em `js/bundle.js` ou `css/bundle.css` deve ser refletido lá.
 - Repositório: https://github.com/CaduCondo/appIPTV
 
