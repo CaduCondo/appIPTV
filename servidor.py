@@ -1,4 +1,4 @@
-"""Servidor local do Cinema Livre.
+"""Servidor local do CineHomeTV.
 
 Serve os arquivos desta pasta em http://localhost:8080 e oferece /proxy?url=...,
 que busca a lista do provedor por você (o navegador sozinho costuma ser bloqueado
@@ -86,7 +86,7 @@ class Server(socketserver.ThreadingMixIn, http.server.HTTPServer):
 
 if __name__ == "__main__":
     srv = Server(("127.0.0.1", PORT), Handler)
-    print("Cinema Livre rodando em http://localhost:%d  (Ctrl+C para parar)" % PORT)
+    print("CineHomeTV rodando em http://localhost:%d  (Ctrl+C para parar)" % PORT)
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

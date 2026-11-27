@@ -52,3 +52,9 @@ Registro do que foi pedido e decidido, em ordem. O Claude atualiza este arquivo 
 - **Sem barra de rolagem lateral: usar carrossel.**
 - Botão **Perfil** (Trocar perfil, Configurações, Ajustes, **Plano**: atual à esquerda, disponíveis à direita; sem Grátis/Degustação, só o administrador vê).
 - Bloco **Últimos adicionados** (10–20 títulos, filmes e séries; etiqueta "Filme"/"Série" no topo esquerdo, nota "X,XX" no topo direito). Bloco **Jogos do dia** (leva ao canal; antes do início mostra o horário).
+
+## 27/nov/2026 — respostas do Cadu (nome, TV, banco)
+
+- **Nome do app: CineHomeTV** (antes "Cinema Livre"/"IPTVHome"). Issue #40.
+- **TV:** TCL com Android TV (confirmar o modelo). Decisão: o destino é um **app de Android TV** (instalado na TV, sem depender de computador); o `iniciar.bat` serve de ponte para testar. Issues #1 e #9.
+- **Banco:** conta nova no Supabase com outro e-mail do Cadu. A conta precisa ser criada por ele (confirmação por e-mail e aceite dos termos); depois conectamos. Issue #22.

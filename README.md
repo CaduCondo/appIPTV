@@ -1,4 +1,4 @@
-# Cinema Livre
+# CineHomeTV
 
 App para assistir **filmes, séries e TV ao vivo** a partir de uma lista que você importa (usuário e senha do provedor, link M3U ou arquivo `.m3u`). Pensado para TV (controle remoto) e funciona no navegador.
 

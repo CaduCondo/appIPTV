@@ -189,15 +189,15 @@ test('as demais mensagens são claras', () => {
 
 // ---------- WhatsApp ----------
 test('mensagem de degustação fala das 2 horas e inclui usuário e senha', () => {
-  const t = R.textoBoasVindas({ app: 'IPTVHome', plano: 'degustacao', usuario: '123456', senha: '654321' });
-  assert.match(t, /Bem Vindo\(a\) a IPTVHome/);
+  const t = R.textoBoasVindas({ app: 'CineHomeTV', plano: 'degustacao', usuario: '123456', senha: '654321' });
+  assert.match(t, /Bem Vindo\(a\) a CineHomeTV/);
   assert.match(t, /2 horas/);
   assert.match(t, /Usuário: 123456/);
   assert.match(t, /Senha: 654321/);
 });
 
 test('mensagem de plano pago informa plano, telas e validade', () => {
-  const t = R.textoBoasVindas({ app: 'IPTVHome', plano: 'anual', telas: 2, ate: D('2027-11-27'), usuario: '11999998888', senha: '111222' });
+  const t = R.textoBoasVindas({ app: 'CineHomeTV', plano: 'anual', telas: 2, ate: D('2027-11-27'), usuario: '11999998888', senha: '111222' });
   assert.match(t, /Plano Anual/);
   assert.match(t, /2 tela/);
   assert.match(t, /27\/11\/2027/);

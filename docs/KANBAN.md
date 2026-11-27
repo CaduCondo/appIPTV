@@ -40,7 +40,7 @@ Regra: só avança de coluna com a evidência da coluna (código, testes verdes,
 
 O quadro de colunas do GitHub exige uma permissão que a sessão do Claude não tem. Para ter as colunas:
 
-1. No GitHub: seu perfil → **Your projects** → **New project** → **Board**. Nome: `Cinema Livre`. Coloque as colunas Backlog, Pronto, Em andamento, Em teste, Feito, Bloqueado.
+1. No GitHub: seu perfil → **Your projects** → **New project** → **Board**. Nome: `CineHomeTV`. Coloque as colunas Backlog, Pronto, Em andamento, Em teste, Feito, Bloqueado.
 2. Em **Workflows** do projeto, ligue "Auto-add to project" para o repositório `appIPTV`.
 3. Avise o Claude. Enquanto isso o quadro funciona pelas etiquetas `estado:*` (filtre as issues por etiqueta).
 

@@ -1,4 +1,4 @@
-/* Cinema Livre — leitura e normalização de listas (sem navegador: testável no Node). */
+/* CineHomeTV — leitura e normalização de listas (sem navegador: testável no Node). */
 (function (root) {
   function yearOf(s) { var m = /[\(\[](19\d\d|20\d\d)[\)\]]/.exec(s || ''); return m ? Number(m[1]) : null; }
   function cleanName(s) { return String(s || '').replace(/\s*[\(\[](19\d\d|20\d\d)[\)\]]\s*$/, '').trim(); }

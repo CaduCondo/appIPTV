@@ -1,5 +1,5 @@
 /**
- * Cinema Livre — REGRAS DE NEGÓCIO (módulo puro, sem navegador e sem banco).
+ * CineHomeTV — REGRAS DE NEGÓCIO (módulo puro, sem navegador e sem banco).
  *
  * Aqui ficam planos, telas simultâneas, empilhamento de planos, geração de
  * usuário/senha, bloqueio por tentativas, mensagens e texto do WhatsApp.
