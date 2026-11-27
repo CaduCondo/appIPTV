@@ -5,21 +5,31 @@ Regras para manter o repositório organizado, documentado e testado. O Claude se
 ## O ciclo (sempre)
 
 ```
-Issue → Analisar → Desenvolver → Testar → Commitar → Pull Request → Actions verde → Merge → Fechar → Documentar → Próxima issue
+Issue → Planejar → TDD (teste primeiro) → Código → Testes (unit → funcional → integração) → PR → CI verde → Merge → Produção → Conferir no ar → Documentar → Próxima issue
 ```
 
-| Passo | O que acontece | Estado da issue |
-|---|---|---|
-| Escolher | O Claude escolhe a próxima da fila (valor, esforço, risco, urgência) | `estado:pronto` |
-| Analisar | Completa contexto, causa raiz, tarefas e critérios BDD na própria issue | `estado:andamento` |
-| Desenvolver | Mudança pequena na branch `tipo/N-assunto` | `estado:andamento` |
-| Testar | `npm run test:unit` e `npm run test:bdd`; e abre o app de verdade no navegador | `estado:andamento` |
-| Commitar | Um commit por assunto, `Refs #N`, e push | `estado:andamento` |
-| Pull Request | O Actions roda unit → smoke → regressão | `estado:teste` |
-| Merge e fechar | Só com tudo verde; comentário simples do que foi feito | `estado:feito` |
-| Documentar | README, `docs/`, manual do Cadu, roadmap, cenários BDD | — |
+| Coluna | O que acontece |
+|---|---|
+| **BACKLOG** | Issue criada com o melhor conteúdo possível: cenário, resultado esperado, resultado obtido (se for bug), BDD |
+| **TO-DO** | Priorizada (P0–P3 e risco) e com critérios claros; o Claude pega a primeira da fila |
+| **WIP** | Branch `tipo/N-assunto`; **TDD**: escreve o teste que falha, escreve o código mínimo, refatora |
+| **WTT** | Testes unitários, funcionais (BDD com Page Objects), integração, regressão, segurança; rodam local e no GitHub Actions |
+| **DONE** | CI verde, Pull Request mergeado na `main` |
+| **IN** | Publicado em produção (Vercel) e conferido no ar; issue fechada |
 
-Regra de ouro: **nada é "feito" sem teste verde.** Se o Actions falhar, a issue volta para `estado:andamento` com um comentário dizendo o que falhou.
+Regra de ouro: **só vai para produção se o CI passar.** Erro achado em qualquer fase vira issue, é corrigido e ganha um teste que garante que **nunca mais volte**; então o ciclo recomeça com a próxima issue.
+
+## Tipos de teste (todos no CI quando possível)
+
+Unitário · funcional (BDD) · integração · homologação (ambiente de teste na Vercel antes da produção) · **regressão** (todo o BDD, em todo PR) · segurança/pentest · carga · estresse. Detalhe em `docs/TESTES.md`.
+
+## Qualidade do código
+
+- **TDD:** teste antes do código.
+- **Orientação a objetos e reuso:** regras de negócio em classes/módulos puros (`js/rules.js`), telas só chamam; nada de copiar e colar.
+- **Comentários:** todo módulo, classe e função explica o porquê (em português), principalmente regras de negócio.
+- **Refatorar sempre:** ao mexer numa área, deixa melhor do que achou; dívida pequena paga na hora, nunca acumula.
+- **Documentar regras de negócio** em `docs/REGRAS_DE_NEGOCIO.md` junto com cada mudança.
 
 ## Defeito achado pelos testes
 
@@ -29,7 +39,7 @@ Regra de ouro: **nada é "feito" sem teste verde.** Se o Actions falhar, a issue
 
 ## Issues
 
-- Uma issue = um assunto. Modelo em `.github/ISSUE_TEMPLATE/` (bug e tarefa).
+- Uma issue = um assunto. Conteúdo: **cenário**, **teste**, **resultado esperado**, **resultado obtido** (bug) e **BDD**. Modelo em `.github/ISSUE_TEMPLATE/` (bug e tarefa).
 - Toda issue tem `tipo:*`, `prioridade:*` e `estado:*`.
 - Rascunhos em `docs/backlog/` (`node tools/criar_issues.js --apply` cria o que ainda não existe).
 - Critérios de aceitação sempre em BDD: **Dado** (situação), **Quando** (ação), **Então** (resultado).

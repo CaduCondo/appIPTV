@@ -1,7 +1,7 @@
 // Ferramenta do quadro: node tools/kanban.js estado <n> <estado> | comentar <n> "texto" | fila
 const { execFileSync } = require('node:child_process');
 const REPO = 'CaduCondo/appIPTV';
-const ESTADOS = ['backlog', 'pronto', 'andamento', 'teste', 'feito', 'bloqueado'];
+const ESTADOS = ['backlog', 'todo', 'wip', 'wtt', 'done', 'in-production', 'bloqueado'];
 
 function gh(args, input) {
   return execFileSync('gh', args, { encoding: 'utf8', input });
@@ -19,7 +19,7 @@ if (cmd === 'estado') {
   const atual = api(`issues/${n}`).labels.map((l) => l.name).filter((l) => l.startsWith('estado:'));
   atual.forEach((l) => { try { gh(['api', '-X', 'DELETE', `repos/${REPO}/issues/${n}/labels/${encodeURIComponent(l)}`]); } catch (e) { /* já não tinha */ } });
   gh(['api', `repos/${REPO}/issues/${n}/labels`, '-f', `labels[]=estado:${novo}`]);
-  if (novo === 'feito') gh(['api', '-X', 'PATCH', `repos/${REPO}/issues/${n}`, '-f', 'state=closed']);
+  if (novo === 'in-production') gh(['api', '-X', 'PATCH', `repos/${REPO}/issues/${n}`, '-f', 'state=closed']);
   console.log(`#${n} -> estado:${novo}`);
 } else if (cmd === 'comentar') {
   api(`issues/${n}/comments`, [['body', resto.join(' ')]]);
