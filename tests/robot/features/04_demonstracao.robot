@@ -13,7 +13,7 @@ Force Tags        demonstracao
 Cenário: A home da demonstração mostra continuar assistindo e jogos de exemplo
     Dado que entrei pela demonstração com o perfil "CaDu"
     Então vejo o texto "Continuar assistindo"
-    E vejo o texto "Adicionados recentemente"
+    E vejo o texto "Últimos adicionados"
     E vejo o texto "Jogos do dia"
     E vejo o texto "Atlético Norte"
     E a página não tem erros de script
