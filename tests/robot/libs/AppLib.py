@@ -155,6 +155,24 @@ class AppLib:
         self.page.wait_for_selector(seletor)
         return self.page.inner_text(seletor).strip()
 
+    def rolagens_laterais(self):
+        """Quantos blocos têm barra de rolagem lateral (deve ser 0: o app usa carrossel)."""
+        return self.page.evaluate("""() => [...document.querySelectorAll('*')].filter(e => {
+            const o = getComputedStyle(e).overflowX;
+            return (o === 'auto' || o === 'scroll') && e.scrollWidth > e.clientWidth + 1;
+        }).length""")
+
+    def textos(self, seletor):
+        self.page.wait_for_selector(seletor)
+        return [t.strip() for t in self.page.locator(seletor).all_inner_texts()]
+
+    def pagina_do_carrossel(self, titulo):
+        """Número (1, 2, ...) da página mostrada no carrossel."""
+        return self.page.evaluate("""(t) => {
+            const dots = [...document.querySelectorAll(`section[aria-label="${t}"] .cl-carousel__dots i`)];
+            return dots.findIndex(d => d.classList.contains('on')) + 1;
+        }""", titulo)
+
     def provedor_url(self):
         return self.provedor
 

@@ -63,6 +63,18 @@ Que estou na tela de criar usuário
     App.Abrir Pagina    /criar-usuario.html
 
 # ---------- Quando ----------
+Toco em Próximos no carrossel "${titulo}"
+    App.Clicar No Elemento    section[aria-label="${titulo}"] button[aria-label="Próximos"]
+
+Toco no jogo que ainda não começou
+    App.Clicar No Elemento    button.match:has-text("Começa às")
+
+Toco no jogo em andamento
+    App.Clicar No Elemento    button.match:has-text("Ao vivo")
+
+Toco no meu perfil
+    App.Clicar No Elemento    .cl-profile
+
 Entro com o usuário "${usuario}" e a senha "${senha}"
     App.Abrir Pagina    /entrar.html
     App.Digitar    ${usuario}
@@ -133,6 +145,25 @@ Escolho a temporada "${nome}"
     App.Clicar No Elemento    .cl-season:has-text("${nome}")
 
 # ---------- Então ----------
+Nenhum bloco tem barra de rolagem lateral
+    ${n}=    App.Rolagens Laterais
+    Should Be Equal As Integers    ${n}    0
+
+O carrossel "${titulo}" está na página ${n}
+    ${p}=    App.Pagina Do Carrossel    ${titulo}
+    Should Be Equal As Integers    ${p}    ${n}
+
+As notas de "${titulo}" estão no formato X,XX
+    ${notas}=    App.Textos    section[aria-label="${titulo}"] .cl-rating--right
+    FOR    ${nota}    IN    @{notas}
+        Should Match Regexp    ${nota}    ^\\d,\\d{2}$
+    END
+
+Vejo as etiquetas Filme e Série em "${titulo}"
+    ${tags}=    App.Textos    section[aria-label="${titulo}"] .cl-flag
+    Should Contain    ${tags}    Filme
+    Should Contain    ${tags}    Série
+
 O usuário criado tem ${n} números
     ${u}=    App.Ler Texto    \#res-usuario
     Should Match Regexp    ${u}    ^\\d{${n}}$
