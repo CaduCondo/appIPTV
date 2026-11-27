@@ -58,3 +58,4 @@ Registro do que foi pedido e decidido, em ordem. O Claude atualiza este arquivo 
 - **Nome do app: CineHomeTV** (antes "Cinema Livre"/"IPTVHome"). Issue #40.
 - **TV:** TCL com Android TV (confirmar o modelo). Decisão: o destino é um **app de Android TV** (instalado na TV, sem depender de computador); o `iniciar.bat` serve de ponte para testar. Issues #1 e #9.
 - **Banco:** conta nova no Supabase com outro e-mail do Cadu. A conta precisa ser criada por ele (confirmação por e-mail e aceite dos termos); depois conectamos. Issue #22.
+- **Modelo da TV:** Smart TV TCL 55" QLED Mini LED 4K **C6K** (Google TV/Android TV). Base para o app de TV (issue #9).

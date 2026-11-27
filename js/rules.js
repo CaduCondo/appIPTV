@@ -250,6 +250,14 @@
         return MENSAGENS.planoVencido;
       case 'sem_rede':
         return MENSAGENS.semRede;
+      case 'formato_nao_suportado':
+        return 'Este vídeo está em um formato que o aparelho não toca (por exemplo .mkv ou .avi). Tente outro título.';
+      case 'rede_falhou':
+        return 'A conexão com o servidor falhou. Verifique a internet e tente de novo.';
+      case 'canal_fora_do_ar':
+        return 'Este canal está fora do ar no momento. Tente outro canal.';
+      case 'decodificacao':
+        return 'Não foi possível reproduzir este vídeo (arquivo com problema). Tente de novo ou escolha outro.';
       case 'limite_telas':
         return 'Seu plano permite ' + ((dados && dados.telas) || 1) + ' tela(s) ao mesmo tempo e já estão em uso.';
       default:
@@ -297,7 +305,40 @@
     return /^\d{11}$/.test(usuario) ? 'https://wa.me/55' + usuario + '?text=' + t : 'https://wa.me/?text=' + t;
   }
 
+  /* =====================================================================
+   * PLAYER
+   * ===================================================================== */
+
+  /**
+   * Transforma um erro do player em um código de mensagem.
+   * html5: erro do <video> (codigo 1..4). hls: erro do hls.js (hlsTipo + status HTTP).
+   */
+  function classificarErroDeMidia(e) {
+    if (e.tipo === 'html5') {
+      return { 1: 'abortado', 2: 'rede_falhou', 3: 'decodificacao', 4: 'formato_nao_suportado' }[e.codigo] || 'generico';
+    }
+    if (e.tipo === 'hls') {
+      if (e.hlsTipo === 'networkError') return e.status === 404 || e.status === 403 ? 'canal_fora_do_ar' : 'rede_falhou';
+      if (e.hlsTipo === 'mediaError') return 'decodificacao';
+    }
+    return 'generico';
+  }
+
+  /** Canal anterior (-1) ou próximo (+1) na lista; dá a volta nas pontas; null se não achar. */
+  function canalVizinho(lista, idAtual, direcao) {
+    var i = (lista || []).findIndex(function (c) { return c.id === idAtual; });
+    if (i < 0) return null;
+    return lista[(i + direcao + lista.length) % lista.length];
+  }
+
+  /** Posição (s) para retomar um vídeo: só se passou de 2 s e não está nos últimos 10 s. */
+  function posicaoParaRetomar(h) {
+    if (!h || !h.dur || h.pos <= 2 || h.pos >= h.dur - 10) return 0;
+    return h.pos;
+  }
+
   var API = {
+    classificarErroDeMidia: classificarErroDeMidia, canalVizinho: canalVizinho, posicaoParaRetomar: posicaoParaRetomar,
     PLANOS: PLANOS, TELAS_MIN: TELAS_MIN, TELAS_MAX: TELAS_MAX, JANELA_ONLINE_MS: JANELA_ONLINE_MS, MENSAGENS: MENSAGENS,
     planosDisponiveis: planosDisponiveis, adicionarMeses: adicionarMeses, novoPeriodo: novoPeriodo, planoAtivo: planoAtivo,
     telasPermitidas: telasPermitidas, gerarSenha: gerarSenha, gerarUsuarioAutomatico: gerarUsuarioAutomatico,

@@ -34,12 +34,21 @@ LIVE = [{"stream_id": 9000 + i, "name": f"Canal {i + 1} HD", "stream_icon": "", 
 # títulos fixos para os cenários procurarem
 VOD[0]["name"] = "Título Único (1996)"
 VOD[0]["category_id"] = "1"
+# um filme em formato que o navegador não toca (.avi) e um canal fora do ar, para os cenários do player
+VOD[1]["name"] = "Formato Estranho (2001)"
+VOD[1]["container_extension"] = "avi"
+LIVE[1]["name"] = "Canal Fora do Ar"
+for _c in LIVE[:3]:
+    _c["category_id"] = "40"  # os 3 primeiros canais ficam na mesma categoria (cenário de trocar de canal)
 
 
 def info_serie():
     ep1 = [{"id": str(70000 + i), "episode_num": i, "title": f"Episódio {i}", "container_extension": "mp4", "info": {"plot": "Resumo do episódio.", "movie_image": f"{BASE}/img/{POSTERS[i % 9]}"}} for i in range(1, 7)]
     ep2 = [{"id": str(70100 + i), "episode_num": i, "title": f"Ep {i} da T2", "container_extension": "mp4", "info": {}} for i in range(1, 4)]
     return {"info": {"plot": "Sinopse da série vinda do provedor.", "cast": "Diego Rocha, Elisa Prado", "genre": "Crime, Drama", "rating": "8.1"}, "episodes": {"1": ep1, "2": ep2}}
+
+
+MEDIA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "media") + os.sep
 
 
 class H(http.server.BaseHTTPRequestHandler):
@@ -78,7 +87,41 @@ class H(http.server.BaseHTTPRequestHandler):
             t += "".join(f'#EXTINF:-1 group-title="Séries",Minha Série S01E0{e}\n{BASE}/series/x/y/{e}.mp4\n' for e in range(1, 4))
             t += f'#EXTINF:-1 group-title="Canais",Canal Teste\n{BASE}/live/x/y/1.m3u8\n'
             return self._send(t.encode(), "text/plain")
+        if p.path.startswith(("/movie/", "/series/")):
+            if p.path.endswith(".avi"):  # formato que o navegador não toca
+                return self._send(os.urandom(2048), "video/x-msvideo")
+            return self._arquivo(MEDIA + "video.mp4", "video/mp4")
+        if p.path.startswith("/live/"):
+            nome = os.path.basename(p.path)
+            if nome == "9001.m3u8":  # canal fora do ar
+                return self._send(b"", "text/plain", 404)
+            if nome.endswith(".m3u8"):
+                return self._arquivo(MEDIA + "index.m3u8", "application/vnd.apple.mpegurl")
+            if nome.endswith(".ts") and nome.startswith("seg"):
+                return self._arquivo(MEDIA + nome, "video/mp2t")
         self._send(b"", "text/plain", 404)
+
+    def _arquivo(self, caminho, ctype):
+        """Entrega um arquivo com suporte a Range (o navegador pede pedaços do vídeo)."""
+        if not os.path.exists(caminho):
+            return self._send(b"", "text/plain", 404)
+        dados = open(caminho, "rb").read()
+        faixa = self.headers.get("Range")
+        if faixa and faixa.startswith("bytes="):
+            ini, _, fim = faixa[6:].partition("-")
+            a = int(ini or 0)
+            b = int(fim) if fim else len(dados) - 1
+            parte = dados[a:b + 1]
+            self.send_response(206)
+            self.send_header("Content-Range", f"bytes {a}-{a + len(parte) - 1}/{len(dados)}")
+        else:
+            parte = dados
+            self.send_response(200)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Accept-Ranges", "bytes")
+        self.send_header("Content-Length", str(len(parte)))
+        self.end_headers()
+        self.wfile.write(parte)
 
 
 class S(socketserver.ThreadingMixIn, http.server.HTTPServer):

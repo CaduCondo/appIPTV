@@ -65,3 +65,11 @@ Fonte da verdade do que o sistema deve fazer, em linguagem simples. Mudou uma re
 ## 9. Pagamento (futuro)
 
 - O usuário escolhe plano e telas, o sistema gera um **Pix**, confirma o pagamento sozinho e libera o plano. O administrador é avisado de cada geração e confirmação.
+
+## 10. Player
+
+- **Filme, episódio e canal ao vivo** tocam na própria tela do app. Canais ao vivo usam HLS (`.m3u8`).
+- **Erros sempre com mensagem clara e o que fazer:** formato que o aparelho não toca (ex.: `.mkv`, `.avi`), falha de conexão, arquivo com problema e **canal fora do ar**. Toda mensagem de erro vem com o botão **Tentar de novo**.
+- **Retomar:** filme e episódio voltam de onde pararam, só se já passou de 2 segundos e não está nos últimos 10 segundos. O botão vira **Continuar**.
+- **Ao vivo:** as setas ↑ ↓ trocam de canal dentro da mesma categoria, dando a volta nas pontas.
+- No player: ← → pulam 10 s, espaço/Enter pausa, Esc/Voltar sai. O cabeçalho some depois de 3 s e volta ao mexer no mouse ou apertar uma tecla.

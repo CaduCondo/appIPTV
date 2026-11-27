@@ -63,6 +63,9 @@ Que estou na tela de criar usuário
     App.Abrir Pagina    /criar-usuario.html
 
 # ---------- Quando ----------
+Mexo o mouse
+    App.Mexer O Mouse
+
 Toco em Próximos no carrossel "${titulo}"
     App.Clicar No Elemento    section[aria-label="${titulo}"] button[aria-label="Próximos"]
 
@@ -145,6 +148,21 @@ Escolho a temporada "${nome}"
     App.Clicar No Elemento    .cl-season:has-text("${nome}")
 
 # ---------- Então ----------
+O vídeo está tocando
+    App.Esperar Video Tocando    1
+
+O vídeo está tocando há ${n} segundos
+    App.Esperar Video Tocando    ${n}
+
+O vídeo retomou em ${n} segundos
+    App.Esperar Video Comecar Em    ${n}
+
+Vejo o botão "${nome}"
+    App.Esperar Elementos    button:has-text("${nome}")
+
+Pressiono a seta "${tecla}"
+    App.Pressionar    ${tecla}
+
 Nenhum bloco tem barra de rolagem lateral
     ${n}=    App.Rolagens Laterais
     Should Be Equal As Integers    ${n}    0

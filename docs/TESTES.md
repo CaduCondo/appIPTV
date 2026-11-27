@@ -22,6 +22,10 @@ npm run test:bdd     # funcional/regressão: Robot Framework + Python/Playwright
 
 Para o BDD, uma vez: `pip install -r tests/robot/requirements.txt` e `python -m playwright install chromium`.
 
+## Vídeos de teste
+
+`tests/mock/media/` tem um filme de 30 s (`video.mp4`) e um canal ao vivo de 12 s (HLS), gerados com ffmpeg e servidos pelo provedor falso. O provedor falso também tem um filme `.avi` (formato que não toca) e um canal fora do ar, para os cenários de erro do player.
+
 ## Como o BDD funciona
 
 - Cenários em português em `tests/robot/features/*.robot` (Dado / Quando / Então / E).
@@ -35,7 +39,7 @@ Para o BDD, uma vez: `pip install -r tests/robot/requirements.txt` e `python -m 
 |---|---|
 | `smoke` | Poucos cenários rápidos e críticos (cai no login, entra com usuário e senha, cria perfil e vê a home). Roda primeiro. |
 | (sem `smoke`) | **Regressão**: o resto. Só roda se o smoke passar. |
-| `lista`, `login`, `usuarios`, `perfis`, `home`, `catalogo`, `demonstracao` | Uma tag por assunto/tela. Ex.: `python -m robot --include catalogo tests/robot/features` |
+| `player`, `lista`, `login`, `usuarios`, `perfis`, `home`, `catalogo`, `demonstracao` | Uma tag por assunto/tela. Ex.: `python -m robot --include catalogo tests/robot/features` |
 
 Cenário novo: exatamente uma rodada (smoke ou regressão) e a tag da tela. Vira `smoke` só se for rápido, confiável, criar o próprio dado e for crítico.
 

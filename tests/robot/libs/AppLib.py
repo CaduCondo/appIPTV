@@ -173,6 +173,24 @@ class AppLib:
             return dots.findIndex(d => d.classList.contains('on')) + 1;
         }""", titulo)
 
+    def esperar_video_tocando(self, segundos=1):
+        """Espera o vídeo estar de fato tocando: o tempo passa de `segundos` e ele não está pausado."""
+        self.page.wait_for_function(
+            "(s) => { const v = document.querySelector('video'); return v && !v.paused && v.currentTime >= s; }",
+            arg=float(segundos), timeout=20000)
+
+    def esperar_video_comecar_em(self, segundos):
+        """Prova que o vídeo RETOMOU: dentro de 1,5 s depois de pronto, o tempo já está em `segundos` ou mais
+        (se começasse do zero, levaria `segundos` para chegar lá)."""
+        self.page.wait_for_function("() => { const v = document.querySelector('video'); return v && v.readyState >= 1; }", timeout=20000)
+        self.page.wait_for_function(
+            "(s) => document.querySelector('video').currentTime >= s", arg=float(segundos), timeout=1500)
+
+    def mexer_o_mouse(self):
+        """Mexe o mouse (no player, isso faz o cabeçalho com o botão Voltar reaparecer)."""
+        self.page.mouse.move(300, 300)
+        self.page.mouse.move(340, 320)
+
     def provedor_url(self):
         return self.provedor
 

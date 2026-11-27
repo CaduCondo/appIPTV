@@ -106,7 +106,7 @@ O Cadu não vai ficar pedindo passo a passo. O Claude toca o backlog do início 
 - **Funcional/integração/regressão (BDD):** Robot Framework + Python/Playwright em `tests/robot/features/*.robot`, em português (Dado/Quando/Então), contra o app de verdade e um provedor de lista **falso** (`tests/mock/xtream_mock.py`).
   - Tag **`smoke`** = rápido e crítico (entrar, criar perfil, home). Roda primeiro. Poucos cenários.
   - Sem tag `smoke` = **regressão**: todo o resto. Só roda depois do smoke passar (`needs`).
-  - Tag por tela (`lista`, `login`, `usuarios`, `perfis`, `home`, `catalogo`, `demonstracao`) para rodar só uma: `python -m robot --include login tests/robot/features`.
+  - Tag por tela (`player`, `lista`, `login`, `usuarios`, `perfis`, `home`, `catalogo`, `demonstracao`) para rodar só uma: `python -m robot --include login tests/robot/features`.
 - **Meta: 100% verde.** Todo vermelho tem causa medida (log, print, vídeo) — nunca "corrigir por dedução".
 - **Evidência:** cenário que passa guarda **print**; cenário que falha guarda **vídeo** e print em `results/` (o Actions anexa a pasta no relatório).
 - **GitHub Actions** (`.github/workflows/ci.yml`) roda tudo em todo push e Pull Request. Depois de cada push: conferir o resultado, comparar com o anterior e agir sozinho.
