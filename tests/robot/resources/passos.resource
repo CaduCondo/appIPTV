@@ -19,30 +19,79 @@ Fechar Aparelho
 Que abri o app
     App.Abrir Pagina    /index.html
 
-Que estou na tela de login
-    App.Abrir Pagina    /login.html
+Que estou na tela de entrar
+    App.Abrir Pagina    /entrar.html
+
+Que entrei como administrador
+    Entro com o usuário "010101" e a senha "123456"
+    App.Esperar Pagina    perfis.html
+
+Que entrei como cliente
+    Entro com o usuário "111111" e a senha "222222"
+    App.Esperar Pagina    perfis.html
+
+Que estou na tela de importar a lista
+    Que entrei como administrador
+    App.Abrir Pagina    /lista.html?trocar=1
 
 Que entrei com a lista de teste e o perfil "${nome}"
-    App.Abrir Pagina    /login.html
+    Que estou na tela de importar a lista
     ${srv}=    App.Provedor Url
     App.Preencher Campo    0    ${srv}
     App.Preencher Campo    1    test
     App.Preencher Campo    2    123
-    App.Clicar No Botao    Entrar
+    App.Clicar No Botao    Importar
     App.Esperar Pagina    perfis.html
     App.Preencher Campo    0    ${nome}
     App.Clicar No Botao    Salvar
     App.Esperar Pagina    home.html
 
 Que entrei pela demonstração com o perfil "${nome}"
-    App.Abrir Pagina    /login.html
-    App.Clicar No Botao    Ver demonstração
-    App.Esperar Pagina    perfis.html
+    Que entrei como administrador
     App.Preencher Campo    0    ${nome}
     App.Clicar No Botao    Salvar
     App.Esperar Pagina    home.html
 
+Que entrei como cliente com o perfil "${nome}"
+    Que entrei como cliente
+    App.Preencher Campo    0    ${nome}
+    App.Clicar No Botao    Salvar
+    App.Esperar Pagina    home.html
+
+Que estou na tela de criar usuário
+    Que entrei como administrador
+    App.Abrir Pagina    /criar-usuario.html
+
 # ---------- Quando ----------
+Entro com o usuário "${usuario}" e a senha "${senha}"
+    App.Abrir Pagina    /entrar.html
+    App.Digitar    ${usuario}
+    App.Pressionar    Enter
+    App.Digitar    ${senha}
+
+Digito a senha "${senha}"
+    App.Digitar    ${senha}
+
+Toco nas teclas "${digitos}"
+    App.Tocar Teclas    ${digitos}
+
+Toco no botão do teclado "${nome}"
+    App.Tocar No Botao Do Teclado    ${nome}
+
+Escolho "${texto}"
+    App.Clicar No Elemento    .choice:has(b:text-is("${texto}"))
+
+Toco exatamente em "${botao}"
+    App.Clicar No Botao Exato    ${botao}
+
+Digito o usuário "${digitos}" no campo manual
+    App.Digitar    ${digitos}
+
+Peço a recuperação para o usuário "${usuario}"
+    App.Abrir Pagina    /recuperar.html
+    App.Preencher Campo    0    ${usuario}
+    App.Clicar No Botao    Enviar código
+
 Preencho servidor, usuário "${usuario}" e senha "${senha}"
     ${srv}=    App.Provedor Url
     App.Preencher Campo    0    ${srv}
@@ -84,6 +133,26 @@ Escolho a temporada "${nome}"
     App.Clicar No Elemento    .cl-season:has-text("${nome}")
 
 # ---------- Então ----------
+O usuário criado tem ${n} números
+    ${u}=    App.Ler Texto    \#res-usuario
+    Should Match Regexp    ${u}    ^\\d{${n}}$
+    Set Test Variable    ${USUARIO_CRIADO}    ${u}
+
+A senha criada tem ${n} números
+    ${s}=    App.Ler Texto    \#res-senha
+    Should Match Regexp    ${s}    ^\\d{${n}}$
+    Set Test Variable    ${SENHA_CRIADA}    ${s}
+
+O usuário criado consegue entrar
+    App.Abrir Pagina    /contas.html
+    App.Clicar No Botao    Sair da conta
+    App.Esperar Pagina    entrar.html
+    Entro com o usuário "${USUARIO_CRIADO}" e a senha "${SENHA_CRIADA}"
+    App.Esperar Pagina    perfis.html
+
+Fico na mesma tela mesmo depois de ${n} tentativas
+    No Operation
+
 Estou na página "${nome}"
     App.Esperar Pagina    ${nome}
 
