@@ -207,3 +207,42 @@ test('link do WhatsApp usa o telefone quando o usuário é de 11 números', () =
   assert.match(R.linkWhatsApp('11999998888', 'oi'), /^https:\/\/wa\.me\/5511999998888\?text=oi$/);
   assert.match(R.linkWhatsApp('123456', 'olá mundo'), /^https:\/\/wa\.me\/\?text=ol%C3%A1%20mundo$/);
 });
+
+// ---------- player: classificar erros e trocar de canal (issue #2) ----------
+test('erro do vídeo HTML5: formato, rede e decodificação', () => {
+  assert.equal(R.classificarErroDeMidia({ tipo: 'html5', codigo: 4 }), 'formato_nao_suportado');
+  assert.equal(R.classificarErroDeMidia({ tipo: 'html5', codigo: 2 }), 'rede_falhou');
+  assert.equal(R.classificarErroDeMidia({ tipo: 'html5', codigo: 3 }), 'decodificacao');
+  assert.equal(R.classificarErroDeMidia({ tipo: 'html5', codigo: 1 }), 'abortado');
+});
+
+test('erro de canal HLS: playlist que não existe é canal fora do ar; falha de rede é rede', () => {
+  assert.equal(R.classificarErroDeMidia({ tipo: 'hls', hlsTipo: 'networkError', status: 404 }), 'canal_fora_do_ar');
+  assert.equal(R.classificarErroDeMidia({ tipo: 'hls', hlsTipo: 'networkError', status: 403 }), 'canal_fora_do_ar');
+  assert.equal(R.classificarErroDeMidia({ tipo: 'hls', hlsTipo: 'networkError', status: 0 }), 'rede_falhou');
+  assert.equal(R.classificarErroDeMidia({ tipo: 'hls', hlsTipo: 'mediaError' }), 'decodificacao');
+  assert.equal(R.classificarErroDeMidia({ tipo: 'hls', hlsTipo: 'otherError' }), 'generico');
+});
+
+test('mensagens do player são claras e dizem o que fazer', () => {
+  assert.match(R.mensagemDeErro('formato_nao_suportado'), /formato/i);
+  assert.match(R.mensagemDeErro('rede_falhou'), /conexão|internet/i);
+  assert.match(R.mensagemDeErro('canal_fora_do_ar'), /fora do ar/i);
+  assert.match(R.mensagemDeErro('decodificacao'), /reproduzir/i);
+});
+
+test('próximo/anterior canal dá a volta nas pontas e ignora id desconhecido', () => {
+  const lista = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+  assert.equal(R.canalVizinho(lista, 'a', 1).id, 'b');
+  assert.equal(R.canalVizinho(lista, 'c', 1).id, 'a');
+  assert.equal(R.canalVizinho(lista, 'a', -1).id, 'c');
+  assert.equal(R.canalVizinho(lista, 'zzz', 1), null);
+  assert.equal(R.canalVizinho([], 'a', 1), null);
+});
+
+test('só retoma o vídeo se já passou de 2 segundos e não está nos últimos 10', () => {
+  assert.equal(R.posicaoParaRetomar({ pos: 1, dur: 100 }), 0);
+  assert.equal(R.posicaoParaRetomar({ pos: 50, dur: 100 }), 50);
+  assert.equal(R.posicaoParaRetomar({ pos: 95, dur: 100 }), 0);
+  assert.equal(R.posicaoParaRetomar(null), 0);
+});
