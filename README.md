@@ -16,9 +16,13 @@ https://caducondo.github.io/appIPTV/ — abra, toque em **Ver demonstração** e
 
 Passo a passo completo, com como atualizar a pasta: [`docs/COMECAR_AQUI.md`](docs/COMECAR_AQUI.md).
 
+## Contas de teste (exemplo)
+
+Administrador `010101` / `123456` · Cliente `111111` / `222222`. Servem só para navegar; as contas de verdade ficam no banco (issue #22) e a senha do administrador nunca entra no código.
+
 ## Telas
 
-Login/importar lista · Perfis · Home · Filmes · Séries · TV ao Vivo · Detalhe (elenco, temporadas, episódios) · Player · Favoritos/Histórico · Contas. A tela de ator ainda é só um modelo (`modelo-ator.html`).
+Entrar · Criar usuário · Importar lista · Perfis · Home · Filmes · Séries · TV ao Vivo · Detalhe (elenco, temporadas, episódios) · Player · Favoritos/Histórico · Contas. A tela de ator ainda é só um modelo (`modelo-ator.html`).
 
 ## Testes
 

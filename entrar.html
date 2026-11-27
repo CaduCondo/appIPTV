@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark"><head><meta charset="utf-8"><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/bundle.css"><link rel="stylesheet" href="css/app.css"><script src="js/react.production.min.js"></script><script src="js/react-dom.production.min.js"></script><script src="js/bundle.js"></script><script src="js/catalog.js"></script><script src="js/rules.js"></script><script src="js/auth.js"></script><script src="js/app.js"></script><script src="js/demo.js"></script><title>Entrar · Cinema Livre</title></head>
+<body>
+<div class="entrar"><div class="entrar__hero"><div class="entrar__wall" id="wall"></div>
+  <div class="entrar__brand"><div class="name">Cinema <b>Livre</b></div><p>Filmes, séries e TV ao vivo, no seu controle remoto.</p></div></div>
+  <div class="entrar__card" id="root"></div></div>
+<script>
+var h = React.createElement, C = window.CinemaLivre, R = window.CLRules;
+var shots = ['inception','batman-cavaleiro-das-trevas-ressurge','mad-max-estrada-da-furia','o-regresso','dunkirk','homem-aranha-sem-volta-para-casa','terra-da-mafia','sintel','big-buck-bunny','elephants-dream','venom','tears-of-steel','haters-back-off','wet-hot-american-summer','inception'];
+var ext = { 'tears-of-steel': 'png', 'haters-back-off': 'png', 'venom': 'png' };
+document.getElementById('wall').innerHTML = shots.concat(shots).map(function (s) { return '<img alt="" src="assets/Demo/' + s + '.' + (ext[s] || 'jpg') + '">'; }).join('');
+if (CL.auth.sessao()) location.replace('index.html');
+
+var MAX = { u: 11, s: 6 };
+function App() {
+  var s = React.useState({ campo: 'u', u: '', s: '', erro: '', msg: CL.q('derrubado') ? 'Esta tela foi desconectada. Entre de novo.' : '', busy: false }), st = s[0];
+  var ref = React.useRef(st); ref.current = st;
+  function set(p) { s[1](function (o) { return Object.assign({}, o, p); }); }
+
+  function entrar(usuario, senha) {
+    if (ref.current.busy) return;
+    if (!usuario || senha.length < 6) return set({ erro: R.MENSAGENS.credenciais, msg: '' });
+    set({ busy: true, erro: '', msg: '' });
+    CL.auth.entrar(usuario, senha, CL.deviceId()).then(function (r) {
+      if (!r.ok) return set({ busy: false, s: '', campo: 's', erro: R.mensagemDeErro(r.codigo, r) });
+      // sem lista ainda: carrega o catálogo de exemplo (a lista de verdade é cadastrada pelo administrador)
+      var pronto = CL.hasList() ? Promise.resolve() : CL.saveCatalog(CL.demoCatalog());
+      pronto.then(function () { location.href = CL.profile() ? 'home.html' : 'perfis.html'; });
+    }).catch(function () { set({ busy: false, erro: R.MENSAGENS.semRede }); });
+  }
+  function digito(d) {
+    var c = ref.current.campo, v = ref.current[c];
+    if (v.length >= MAX[c]) return;
+    var novo = v + d, p = { erro: '', msg: '' }; p[c] = novo; set(p);
+    if (c === 'u' && novo.length === MAX.u) set({ campo: 's' });
+    if (c === 's' && novo.length === MAX.s) entrar(ref.current.u, novo);
+  }
+  function apagar() { var c = ref.current.campo, p = { erro: '' }; p[c] = ref.current[c].slice(0, -1); set(p); }
+  function confirmar() {
+    var x = ref.current;
+    if (x.campo === 'u') return x.u ? set({ campo: 's' }) : set({ erro: R.MENSAGENS.credenciais });
+    entrar(x.u, x.s);
+  }
+  React.useEffect(function () {
+    function onKey(e) {
+      if (/^\d$/.test(e.key)) { e.preventDefault(); digito(e.key); }
+      else if (e.key === 'Backspace') { e.preventDefault(); e.stopImmediatePropagation(); apagar(); }
+      else if (e.key === 'Enter' && !(document.activeElement && document.activeElement.tagName === 'BUTTON') && !(document.activeElement && document.activeElement.getAttribute('role') === 'button')) { e.preventDefault(); confirmar(); }
+    }
+    document.addEventListener('keydown', onKey, true);
+    return function () { document.removeEventListener('keydown', onKey, true); };
+  }, []);
+
+  return h('div', null,
+    h('h1', null, 'Entrar'),
+    h(C.DigitField, { label: 'Usuário', value: st.u, placeholder: 'Digite o usuário', active: st.campo === 'u', error: !!st.erro, onClick: function () { set({ campo: 'u' }); } }),
+    h(C.DigitField, { label: 'Senha', value: st.s, masked: true, slots: 6, placeholder: 'Digite a senha', active: st.campo === 's', error: !!st.erro, onClick: function () { set({ campo: 's' }); } }),
+    st.erro && h('div', { className: 'msg err', role: 'alert' }, st.erro),
+    st.msg && h('div', { className: 'msg', role: 'status' }, st.msg),
+    st.busy && h('div', { className: 'msg', role: 'status' }, 'Entrando…'),
+    h(C.NumericKeypad, { onDigit: digito, onBackspace: apagar, onEnter: confirmar, enterLabel: st.campo === 'u' ? 'Próximo' : 'Entrar' }),
+    h('div', { className: 'btns' }, h(C.ActionButton, { icon: 'settings', onClick: function () { location.href = 'recuperar.html'; } }, 'Esqueci minha senha')),
+    h('div', { className: 'entrar__aviso' }, 'Modo de teste: administrador 010101 / 123456, cliente 111111 / 222222 (contas de exemplo).'));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+CL.initNav();
+</script></body></html>

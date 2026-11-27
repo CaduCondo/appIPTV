@@ -192,23 +192,44 @@
     });
   };
 
-  /* ---------- perfis ---------- */
-  CL.profiles = function () { return CL.get('profiles', []); };
+  /* ---------- conta (login) ---------- */
+  CL.auth = new window.CLAuth.ServicoAuth({ storage: LS });
+  /** Código do aparelho: gerado na instalação (o MAC não pode ser lido por navegador nem pelo Android atual). */
+  CL.deviceId = function () {
+    var d = CL.get('deviceid');
+    if (!d) { d = 'ap-' + CL.uid() + CL.uid(); CL.set('deviceid', d); }
+    return d;
+  };
+  CL.isAdmin = function () { var s = CL.auth.sessao(); return !!s && s.papel === 'admin'; };
+  CL.usuario = function () { var s = CL.auth.sessao(); return s ? s.usuario : null; };
+  /** Mantém o aparelho "online" (batimento a cada 30 s). Se foi derrubado, volta ao login. */
+  CL.startHeartbeat = function () {
+    if (CL._hb) return;
+    CL._hb = setInterval(function () {
+      if (!CL.auth.batimento()) { clearInterval(CL._hb); CL.auth.sair().then(function () { location.replace('entrar.html?derrubado=1'); }); }
+    }, 30000);
+  };
+  CL.logout = function () { return CL.auth.sair().then(function () { location.href = 'entrar.html'; }); };
+
+  /* ---------- perfis (guardados por usuário) ---------- */
+  function uk(s) { return 'u.' + (CL.usuario() || 'x') + '.' + s; }
+  CL.profiles = function () { return CL.get(uk('profiles'), []); };
   CL.addProfile = function (name, color) {
     var l = CL.profiles(), p = { id: CL.uid(), name: name, color: color || 'brand' };
-    l.push(p); CL.set('profiles', l); return p;
+    l.push(p); CL.set(uk('profiles'), l); return p;
   };
   CL.updateProfile = function (id, name, color) {
-    CL.set('profiles', CL.profiles().map(function (p) { return p.id === id ? { id: id, name: name, color: color } : p; }));
+    CL.set(uk('profiles'), CL.profiles().map(function (p) { return p.id === id ? { id: id, name: name, color: color } : p; }));
   };
   CL.removeProfile = function (id) {
-    CL.set('profiles', CL.profiles().filter(function (p) { return p.id !== id; }));
+    CL.set(uk('profiles'), CL.profiles().filter(function (p) { return p.id !== id; }));
     CL.del('p.' + id + '.fav'); CL.del('p.' + id + '.hist');
-    if (CL.get('active') === id) CL.del('active');
+    if (CL.activeId() === id) CL.del(uk('active'));
   };
-  CL.setActive = function (id) { CL.set('active', id); };
+  CL.activeId = function () { return CL.get(uk('active')); };
+  CL.setActive = function (id) { CL.set(uk('active'), id); };
   CL.profile = function () {
-    var id = CL.get('active'); return CL.profiles().filter(function (p) { return p.id === id; })[0] || null;
+    var id = CL.activeId(); return CL.profiles().filter(function (p) { return p.id === id; })[0] || null;
   };
 
   /* favoritos e histórico são do perfil ativo */
@@ -243,9 +264,15 @@
   /* ---------- páginas ---------- */
   CL.q = function (k) { return new URLSearchParams(location.search).get(k); };
   CL.go = function (page) { location.href = page; };
+  /**
+   * Protege a página: exige login, lista carregada e (opcionalmente) perfil escolhido.
+   * A conferência de verdade é do servidor; aqui é só para levar a pessoa ao lugar certo.
+   */
   CL.guard = function (needProfile) {
-    if (!CL.hasList()) { location.replace('login.html'); return false; }
+    if (!CL.auth.sessao()) { location.replace('entrar.html'); return false; }
+    if (!CL.hasList()) { location.replace(CL.isAdmin() ? 'lista.html' : 'entrar.html'); return false; }
     if (needProfile && !CL.profile()) { location.replace('perfis.html'); return false; }
+    CL.startHeartbeat();
     return true;
   };
   CL.fit = function () {

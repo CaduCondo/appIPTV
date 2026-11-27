@@ -133,6 +133,28 @@ class AppLib:
     def preencher_campo(self, indice, valor):
         self.page.locator('.cl-field__input').nth(int(indice)).fill(valor)
 
+    def clicar_no_botao_exato(self, texto):
+        self.page.get_by_role('button', name=texto, exact=True).first.click()
+
+    def digitar(self, texto):
+        """Digita números como no teclado do computador/controle."""
+        self.page.keyboard.type(texto, delay=20)
+
+    def pressionar(self, tecla):
+        self.page.keyboard.press(tecla)
+
+    def tocar_teclas(self, digitos):
+        """Toca nas teclas do teclado numérico da tela, uma a uma."""
+        for d in digitos:
+            self.page.locator(f'button[aria-label="{d}"]').first.click()
+
+    def tocar_no_botao_do_teclado(self, nome):
+        self.page.locator(f'button[aria-label="{nome}"]').first.click()
+
+    def ler_texto(self, seletor):
+        self.page.wait_for_selector(seletor)
+        return self.page.inner_text(seletor).strip()
+
     def provedor_url(self):
         return self.provedor
 

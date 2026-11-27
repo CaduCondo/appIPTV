@@ -108,3 +108,16 @@
 .cl-hub--big .cl-icon { color: var(--on-brand); }
 .cl-hub--big .cl-hub__sub { color: var(--on-brand); }
 .cl-hub:focus-visible, .cl-hub.is-focused { outline: 4px solid var(--focus); outline-offset: 2px; }
+
+/* Campo numérico em slots + teclado da tela (controle remoto) */
+.cl-digits { display: flex; flex-direction: column; gap: 4px; padding: 12px 18px; border-radius: var(--radius-lg); border: 2px solid var(--line-strong); background: var(--surface-200); color: var(--ink); font-family: var(--font-sans); cursor: pointer; outline: none; }
+.cl-digits__label { font: 600 14px/18px var(--font-sans); color: var(--ink-muted); }
+.cl-digits__value { font: 700 30px/38px var(--font-display); letter-spacing: .08em; min-height: 38px; word-break: break-all; }
+.cl-digits__ph { font: 500 18px/38px var(--font-sans); letter-spacing: 0; color: var(--ink-muted); }
+.cl-digits.is-active { border-color: var(--brand); }
+.cl-digits.has-error { border-color: var(--danger); }
+.cl-digits:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
+.cl-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.cl-key { display: grid; place-items: center; height: 60px; border-radius: var(--radius-md); border: 2px solid var(--line-strong); background: var(--surface-200); color: var(--ink); font: 700 26px/1 var(--font-display); cursor: pointer; }
+.cl-key--primary { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+.cl-key:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }

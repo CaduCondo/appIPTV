@@ -15,16 +15,22 @@ Se aparecer "Python não encontrado", refaça o passo 1 (a caixinha do PATH é a
 
 ## 2. Entrar no app
 
-Na primeira tela escolha como importar a lista:
+Na tela **Entrar**, digite o usuário e a senha (números) pelo teclado da tela, pelas setas + Enter, ou pelo teclado do computador.
 
-- **Usuário e senha:** servidor (começa com `http://`), usuário e senha que o provedor te deu.
-- **Link M3U:** cole o link da lista.
-- **Arquivo:** escolha um arquivo `.m3u` baixado, ou cole o texto da lista.
-- **Ver demonstração:** entra com um catálogo de exemplo (filmes abertos da Blender tocam de verdade).
+**Contas de teste (exemplo, não são as contas de verdade):**
 
-Depois crie o seu perfil (nome e cor). Favoritos e "continuar assistindo" são de cada perfil.
+| Conta | Usuário | Senha | O que testa |
+|---|---|---|---|
+| Administrador | 010101 | 123456 | vê "Criar usuário" e a importação de lista |
+| Cliente | 111111 | 222222 | plano Mensal, 2 telas |
+| Plano vencido | 333333 | 444444 | mensagem de plano vencido |
+| Tela em uso | 555555 | 666666 | mensagem de limite de telas |
 
-Teclas: setas navegam, **Enter** abre, **Esc** volta. No player: setas ← → pulam 10 segundos, espaço pausa.
+Depois escolha ou crie o seu **perfil**. Favoritos e "continuar assistindo" são de cada perfil.
+
+**Administrador** (010101): na home, **Criar usuário** → automático ou manual → tempo de acesso → telas → **Criar usuário** → **Compartilhar por WhatsApp**. A lista do provedor só o administrador importa (Contas → Trocar lista).
+
+Teclas: setas navegam, **Enter** abre, **Esc** volta. No player: ← → pulam 10 segundos, espaço pausa.
 
 ## 3. Atualizar a pasta com a versão mais nova (quando o Claude mexer no código pela nuvem)
 
