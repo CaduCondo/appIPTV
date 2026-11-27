@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"CinemaLivre","components":[{"name":"Icon"},{"name":"RatingBadge"},{"name":"PosterCard"},{"name":"CategoryMenu"},{"name":"MetaChips"},{"name":"CastAvatar"},{"name":"SeasonTabs"},{"name":"EpisodeCard"},{"name":"ActionButton"},{"name":"Field"},{"name":"ProfileItem"},{"name":"HubTile"},{"name":"DigitField"},{"name":"NumericKeypad"}]} */
+/* @ds-bundle: {"format":4,"namespace":"CinemaLivre","components":[{"name":"Icon"},{"name":"RatingBadge"},{"name":"PosterCard"},{"name":"CategoryMenu"},{"name":"MetaChips"},{"name":"CastAvatar"},{"name":"SeasonTabs"},{"name":"EpisodeCard"},{"name":"ActionButton"},{"name":"Field"},{"name":"ProfileItem"},{"name":"HubTile"},{"name":"DigitField"},{"name":"NumericKeypad"},{"name":"Carousel"}]} */
 (function () {
   var h = React.createElement;
 
@@ -40,7 +40,8 @@
     history: 'M12 7v5l3 2 M4 12a8 8 0 1 0 2.3-5.7 M4 4v4h4',
     logout: 'M10 4H5v16h5 M15 8l4 4-4 4 M19 12H9',
     pause: 'M8 5v14 M16 5v14',
-    backspace: 'M21 5H9l-6 7 6 7h12z M14 9l4 6 M18 9l-4 6'
+    backspace: 'M21 5H9l-6 7 6 7h12z M14 9l4 6 M18 9l-4 6',
+    next: 'M9 5l7 7-7 7'
   };
 
   /* Icon: 24px grid, 2px stroke, currentColor. */
@@ -83,13 +84,16 @@
     );
   }
 
+  /** Nota no formato "X,XX" (duas casas, vírgula). `side="right"` põe no canto superior direito. */
+  function formatarNota(v) { return Number(v).toFixed(2).replace('.', ','); }
+
   function RatingBadge(props) {
     var v = Number(props.value);
     return h(
       'span',
-      { className: cx('cl-rating', props.className), 'aria-label': 'Nota ' + v.toFixed(1) },
+      { className: cx('cl-rating', props.side === 'right' && 'cl-rating--right', props.className), 'aria-label': 'Nota ' + formatarNota(v) },
       h(Icon, { name: 'star', size: 14, fill: true }),
-      v.toFixed(1)
+      formatarNota(v)
     );
   }
 
@@ -106,7 +110,8 @@
         'div',
         { className: 'cl-poster__art', style: props.ratio ? { aspectRatio: props.ratio } : undefined },
         h(Art, { src: props.src, label: props.title, mark: props.title, alt: 'Pôster de ' + props.title, fit: props.fit }),
-        props.rating != null && h(RatingBadge, { value: props.rating }),
+        props.kind && h('span', { className: 'cl-flag' }, props.kind),
+        props.rating != null && h(RatingBadge, { value: props.rating, side: props.kind ? 'right' : undefined }),
         props.tag && h('span', { className: 'cl-tag' }, props.tag)
       ),
       h('div', { className: 'cl-poster__title', title: props.title }, props.title),
@@ -148,9 +153,9 @@
       props.rating != null &&
         h(
           'span',
-          { className: 'cl-chip cl-chip--rating', 'aria-label': 'Nota ' + (props.source || 'IMDb') + ' ' + Number(props.rating).toFixed(1) },
+          { className: 'cl-chip cl-chip--rating', 'aria-label': 'Nota ' + (props.source || 'IMDb') + ' ' + formatarNota(props.rating) },
           h(Icon, { name: 'star', size: 16, fill: true }),
-          Number(props.rating).toFixed(1),
+          formatarNota(props.rating),
           h('span', { className: 'cl-chip__src' }, props.source || 'IMDb')
         ),
       props.age != null &&
@@ -311,7 +316,48 @@
     );
   }
 
+  /**
+   * Carrossel: no lugar de qualquer barra de rolagem lateral.
+   * Mostra `perPage` itens por vez; setas ‹ › e bolinhas; quando o foco (setas do controle)
+   * chega a um item fora da vista, o carrossel avança sozinho.
+   */
+  function Carousel(props) {
+    var items = React.Children.toArray(props.children), per = props.perPage || 4;
+    var pages = Math.max(1, Math.ceil(items.length / per));
+    var st = React.useState(0), page = st[0], setPage = st[1];
+    var vp = React.useRef(null);
+    function ir(p) { setPage(Math.max(0, Math.min(pages - 1, p))); }
+    React.useEffect(function () {
+      var el = vp.current; if (!el) return;
+      var kids = el.firstChild ? el.firstChild.children : [];
+      var alvo = kids[page * per];
+      if (alvo && kids[0]) el.scrollTo({ left: alvo.offsetLeft - kids[0].offsetLeft, behavior: 'smooth' });
+    }, [page, per, items.length]);
+    function aoFocar(e) {
+      var el = e.target, kids = vp.current && vp.current.firstChild ? vp.current.firstChild.children : [];
+      for (var i = 0; i < kids.length; i++) if (kids[i].contains(el)) { var p = Math.floor(i / per); if (p !== page) setPage(p); break; }
+    }
+    return h(
+      'section',
+      { className: cx('cl-carousel', props.className), 'aria-label': props.titulo || 'Carrossel', style: { '--per': per, '--gap': (props.gap || 12) + 'px' } },
+      (props.titulo || pages > 1) && h(
+        'div',
+        { className: 'cl-carousel__head' },
+        h('div', { className: 'cl-carousel__title' }, props.titulo, props.selo),
+        pages > 1 && h(
+          'div',
+          { className: 'cl-carousel__nav' },
+          h('button', { type: 'button', tabIndex: -1, 'aria-label': 'Anteriores', disabled: page === 0, className: 'cl-carousel__btn', onClick: function () { ir(page - 1); } }, h(Icon, { name: 'back', size: 20 })),
+          h('span', { className: 'cl-carousel__dots', 'aria-hidden': 'true' }, Array.apply(null, Array(pages)).map(function (_, i) { return h('i', { key: i, className: i === page ? 'on' : '' }); })),
+          h('button', { type: 'button', tabIndex: -1, 'aria-label': 'Próximos', disabled: page === pages - 1, className: 'cl-carousel__btn', onClick: function () { ir(page + 1); } }, h(Icon, { name: 'next', size: 20 }))
+        )
+      ),
+      h('div', { className: 'cl-carousel__viewport', ref: vp, onFocus: aoFocar }, h('div', { className: 'cl-carousel__track' }, items))
+    );
+  }
+
   window.CinemaLivre = {
+    Carousel: Carousel,
     DigitField: DigitField,
     NumericKeypad: NumericKeypad,
     Field: Field,
