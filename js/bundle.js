@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"CinemaLivre","components":[{"name":"Icon"},{"name":"RatingBadge"},{"name":"PosterCard"},{"name":"CategoryMenu"},{"name":"MetaChips"},{"name":"CastAvatar"},{"name":"SeasonTabs"},{"name":"EpisodeCard"},{"name":"ActionButton"},{"name":"Field"},{"name":"ProfileItem"},{"name":"HubTile"}]} */
+/* @ds-bundle: {"format":4,"namespace":"CinemaLivre","components":[{"name":"Icon"},{"name":"RatingBadge"},{"name":"PosterCard"},{"name":"CategoryMenu"},{"name":"MetaChips"},{"name":"CastAvatar"},{"name":"SeasonTabs"},{"name":"EpisodeCard"},{"name":"ActionButton"},{"name":"Field"},{"name":"ProfileItem"},{"name":"HubTile"},{"name":"DigitField"},{"name":"NumericKeypad"}]} */
 (function () {
   var h = React.createElement;
 
@@ -39,7 +39,8 @@
     refresh: 'M20 12a8 8 0 1 1-2.5-5.8 M20 4v5h-5',
     history: 'M12 7v5l3 2 M4 12a8 8 0 1 0 2.3-5.7 M4 4v4h4',
     logout: 'M10 4H5v16h5 M15 8l4 4-4 4 M19 12H9',
-    pause: 'M8 5v14 M16 5v14'
+    pause: 'M8 5v14 M16 5v14',
+    backspace: 'M21 5H9l-6 7 6 7h12z M14 9l4 6 M18 9l-4 6'
   };
 
   /* Icon: 24px grid, 2px stroke, currentColor. */
@@ -278,7 +279,41 @@
     );
   }
 
+  /* Campo numérico em "slots", para digitar com o teclado da tela (controle remoto). */
+  function DigitField(props) {
+    var v = String(props.value || ''), shown;
+    if (!v) shown = h('span', { className: 'cl-digits__ph' }, props.placeholder || '');
+    else if (props.masked) {
+      var total = Math.max(props.slots || 0, v.length), dots = '';
+      for (var i = 0; i < total; i++) dots += i < v.length ? '\u25CF ' : '\u25CB ';
+      shown = dots.trim();
+    } else shown = v.split('').join(' ');
+    return h(
+      'div',
+      { className: cx('cl-digits', props.active && 'is-active', props.error && 'has-error'), tabIndex: 0, role: 'button', 'aria-label': props.label, onClick: props.onClick },
+      h('span', { className: 'cl-digits__label' }, props.label),
+      h('span', { className: 'cl-digits__value' }, shown)
+    );
+  }
+
+  function NumericKeypad(props) {
+    var keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    function key(label, onClick, extra, aria) {
+      return h('button', { type: 'button', key: aria || label, className: cx('cl-key', extra), 'aria-label': aria || label, onClick: onClick }, label);
+    }
+    return h(
+      'div',
+      { className: 'cl-keypad', role: 'group', 'aria-label': 'Teclado numérico' },
+      keys.map(function (k) { return key(k, function () { props.onDigit(k); }); }),
+      h('button', { type: 'button', key: 'bs', className: 'cl-key', 'aria-label': 'Apagar', onClick: props.onBackspace }, h(Icon, { name: 'backspace', size: 28 })),
+      key('0', function () { props.onDigit('0'); }),
+      h('button', { type: 'button', key: 'ok', className: 'cl-key cl-key--primary', 'aria-label': props.enterLabel || 'Confirmar', onClick: props.onEnter }, h(Icon, { name: 'check', size: 28 }))
+    );
+  }
+
   window.CinemaLivre = {
+    DigitField: DigitField,
+    NumericKeypad: NumericKeypad,
     Field: Field,
     ProfileItem: ProfileItem,
     HubTile: HubTile,
