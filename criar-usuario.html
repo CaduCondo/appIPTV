@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark"><head><meta charset="utf-8"><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/bundle.css"><link rel="stylesheet" href="css/app.css"><script src="js/react.production.min.js"></script><script src="js/react-dom.production.min.js"></script><script src="js/bundle.js"></script><script src="js/catalog.js"></script><script src="js/rules.js"></script><script src="js/auth.js"></script><script src="js/app.js"></script><script src="js/demo.js"></script><title>Criar usuário · Cinema Livre</title></head>
+<body><div class="page"><div id="root"></div></div>
+<script>
+/* Criar usuário — só administrador. As regras estão em js/rules.js; quem confere a permissão é CL.auth.criarUsuario. */
+if (!CL.auth.sessao()) { location.replace('entrar.html'); throw new Error('redirect'); }
+if (!CL.isAdmin()) { location.replace('home.html'); throw new Error('redirect'); }
+CL.startHeartbeat();
+var h = React.createElement, C = window.CinemaLivre, R = window.CLRules, APP = 'IPTVHome';
+
+var PLANOS = R.planosDisponiveis('admin');
+var DUR = { gratis: 'para sempre', degustacao: '2 horas', mensal: '1 mês', trimestral: '3 meses', semestral: '6 meses', anual: '1 ano', '2anos': '2 anos', '3anos': '3 anos' };
+
+function Escolha(props) {
+  return h('button', { type: 'button', className: 'choice' + (props.on ? ' is-on' : ''), onClick: props.onClick }, h('b', null, props.titulo), props.sub && h('span', null, props.sub));
+}
+
+function App() {
+  var s = React.useState({ modo: null, usuario: '', plano: null, telas: null, erro: '', busy: false, resultado: null }), st = s[0];
+  var ref = React.useRef(st); ref.current = st;
+  function set(p) { s[1](function (o) { return Object.assign({}, o, p); }); }
+
+  /* teclado numérico para o usuário manual (11 números) */
+  function digito(d) { if (ref.current.modo === 'manual' && !ref.current.plano && ref.current.usuario.length < 11) set({ usuario: ref.current.usuario + d, erro: '' }); }
+  function apagar() { set({ usuario: ref.current.usuario.slice(0, -1), erro: '' }); }
+  React.useEffect(function () {
+    function onKey(e) {
+      if (ref.current.modo !== 'manual' || ref.current.plano || ref.current.resultado) return;
+      if (/^\d$/.test(e.key)) { e.preventDefault(); digito(e.key); }
+      else if (e.key === 'Backspace') { e.preventDefault(); e.stopImmediatePropagation(); apagar(); }
+    }
+    document.addEventListener('keydown', onKey, true);
+    return function () { document.removeEventListener('keydown', onKey, true); };
+  }, []);
+
+  function avancarManual() {
+    var v = R.validarUsuarioManual(ref.current.usuario);
+    if (!v.ok) return set({ erro: v.erro });
+    set({ erro: '', manualOk: true });
+  }
+  function criar() {
+    var x = ref.current;
+    set({ busy: true, erro: '' });
+    CL.auth.criarUsuario({ modo: x.modo, usuario: x.usuario, plano: x.plano, telas: x.telas }).then(function (r) {
+      if (!r.ok) {
+        var msg = r.codigo === 'usuario_existente' ? 'Esse usuário já existe.' : r.codigo === 'nao_autorizado' ? 'Você não tem permissão para criar usuários.' : (r.erro || 'Não foi possível criar o usuário.');
+        return set({ busy: false, erro: msg });
+      }
+      set({ busy: false, resultado: r, plano: x.plano, telas: r.periodo.telas });
+    });
+  }
+  function reiniciar() { set({ modo: null, usuario: '', plano: null, telas: null, erro: '', resultado: null, manualOk: false }); }
+
+  var x = st, passo = x.resultado ? 4 : (x.plano && (x.plano === 'degustacao' || x.telas)) ? 3 : x.plano ? 3 : (x.modo === 'auto' || x.manualOk) ? 2 : 1;
+  var cab = h('div', null,
+    h('div', { className: 'topbar' }, h('h1', { className: 'h-title' }, 'Criar usuário'), h('div', { className: 'btns' }, h(C.ActionButton, { icon: 'home', onClick: function () { location.href = 'home.html'; } }, 'Início'))),
+    h('div', { className: 'stepper' }, ['1 Como criar', '2 Tempo de acesso', '3 Telas', '4 Pronto'].map(function (t, i) { return h('span', { key: i, className: i + 1 <= passo ? 'on' : '' }, t); })));
+
+  if (x.resultado) {
+    var r = x.resultado, texto = R.textoBoasVindas({ app: APP, plano: x.plano, telas: r.periodo.telas, ate: r.periodo.fim, usuario: r.usuario, senha: r.senha });
+    return h('div', null, cab,
+      h('div', { className: 'result' },
+        h('div', null, h('div', { className: 'lbl' }, 'USUÁRIO'), h('div', { className: 'big', id: 'res-usuario' }, r.usuario)),
+        h('div', null, h('div', { className: 'lbl' }, 'SENHA'), h('div', { className: 'big', id: 'res-senha' }, r.senha)),
+        h('div', { className: 'muted' }, R.PLANOS[x.plano].nome + ' · ' + r.periodo.telas + ' tela(s)' + (r.periodo.fim ? ' · até ' + R.dataBR(r.periodo.fim) : '')),
+        h('div', { className: 'btns' },
+          h(C.ActionButton, { variant: 'primary', icon: 'related', onClick: function () { window.open(R.linkWhatsApp(r.usuario, texto), '_blank'); } }, 'Compartilhar por WhatsApp'),
+          h(C.ActionButton, { icon: 'plus', onClick: reiniciar }, 'Criar outro usuário'))));
+  }
+
+  /* passo 1: como criar */
+  var blocos = [cab];
+  blocos.push(h('h2', { key: 'p1', className: 'h-sec' }, '1. Como criar o usuário?'),
+    h('div', { key: 'm', className: 'choices two' },
+      h(Escolha, { titulo: 'Criar usuário automaticamente', sub: 'Usuário e senha de 6 números sorteados', on: x.modo === 'auto', onClick: function () { set({ modo: 'auto', manualOk: false, plano: null, telas: null, erro: '' }); } }),
+      h(Escolha, { titulo: 'Criar usuário manualmente', sub: 'Você digita o usuário (11 números); a senha é sorteada', on: x.modo === 'manual', onClick: function () { set({ modo: 'manual', manualOk: false, plano: null, telas: null, erro: '' }); } })));
+
+  if (x.modo === 'manual' && !x.manualOk) {
+    blocos.push(h('div', { key: 'man', style: { maxWidth: 420, margin: '16px 0', display: 'flex', flexDirection: 'column', gap: 10 } },
+      h(C.DigitField, { label: 'Usuário (11 números, telefone com DDD)', value: x.usuario, placeholder: '00000000000', active: true, error: !!x.erro }),
+      x.erro && h('div', { className: 'msg err', role: 'alert' }, x.erro),
+      h(C.NumericKeypad, { onDigit: digito, onBackspace: apagar, onEnter: avancarManual, enterLabel: 'Continuar' })));
+  }
+
+  /* passo 2: plano */
+  if (x.modo === 'auto' || x.manualOk) {
+    blocos.push(h('h2', { key: 'p2', className: 'h-sec' }, '2. Quanto tempo de acesso?'),
+      h('div', { key: 'pl', className: 'choices' }, PLANOS.map(function (p) {
+        return h(Escolha, { key: p.id, titulo: p.nome, sub: DUR[p.id], on: x.plano === p.id, onClick: function () { set({ plano: p.id, telas: p.id === 'degustacao' ? 1 : null, erro: '' }); } });
+      })));
+  }
+
+  /* passo 3: telas (Degustação não precisa: 1 tela) */
+  if (x.plano && x.plano !== 'degustacao') {
+    blocos.push(h('h2', { key: 'p3', className: 'h-sec' }, '3. Quantas telas ao mesmo tempo?'),
+      h('div', { key: 'te', className: 'choices five' }, [1, 2, 3, 4, 5].map(function (n) {
+        return h(Escolha, { key: n, titulo: n + (n === 1 ? ' Tela' : ' Telas'), sub: n + (n === 1 ? ' dispositivo online' : ' dispositivos online'), on: x.telas === n, onClick: function () { set({ telas: n }); } });
+      })));
+  }
+
+  /* criar */
+  if (x.plano && (x.plano === 'degustacao' || x.telas)) {
+    blocos.push(h('div', { key: 'cr', style: { marginTop: 20 } },
+      x.erro && h('div', { className: 'msg err', role: 'alert', style: { marginBottom: 12, maxWidth: 560 } }, x.erro),
+      h(C.ActionButton, { variant: 'primary', icon: 'check', onClick: criar }, x.busy ? 'Criando…' : 'Criar usuário')));
+  }
+  return h('div', null, blocos);
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+CL.initNav();
+</script></body></html>

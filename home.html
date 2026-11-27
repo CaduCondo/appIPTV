@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="dark"><head><meta charset="utf-8"><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/bundle.css"><link rel="stylesheet" href="css/app.css"><script src="js/react.production.min.js"></script><script src="js/react-dom.production.min.js"></script><script src="js/bundle.js"></script><script src="js/catalog.js"></script><script src="js/app.js"></script><script src="js/demo.js"></script><title>Início · Cinema Livre</title></head>
+<html lang="pt-BR" data-theme="dark"><head><meta charset="utf-8"><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/bundle.css"><link rel="stylesheet" href="css/app.css"><script src="js/react.production.min.js"></script><script src="js/react-dom.production.min.js"></script><script src="js/bundle.js"></script><script src="js/catalog.js"></script><script src="js/rules.js"></script><script src="js/auth.js"></script><script src="js/app.js"></script><script src="js/demo.js"></script><title>Início · Cinema Livre</title></head>
 <body>
 <div class="page"><div id="root"></div></div>
 <script>
@@ -32,7 +32,8 @@ function App() {
       h('div', { className: 'brand-mark' }, 'Cinema ', h('b', null, 'Livre')),
       h('div', { className: 'muted', style: { font: '600 20px/26px var(--font-sans)' } }, now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })),
       h('div', { className: 'btns' },
-        h(C.ActionButton, { icon: 'refresh', onClick: function () { location.href = 'contas.html?recarregar=1'; } }, 'Recarregar'),
+        CL.isAdmin() && h(C.ActionButton, { variant: 'primary', icon: 'plus', onClick: function () { location.href = 'criar-usuario.html'; } }, 'Criar usuário'),
+        CL.isAdmin() && h(C.ActionButton, { icon: 'refresh', onClick: function () { location.href = 'contas.html?recarregar=1'; } }, 'Recarregar'),
         h(C.ActionButton, { icon: 'settings', onClick: function () { location.href = 'embreve.html?t=Ajustes'; } }, 'Ajustes'),
         h(C.ProfileItem, { name: prof.name, color: prof.color, onClick: function () { location.href = 'perfis.html'; } }))),
     h('div', { className: 'hello' },
