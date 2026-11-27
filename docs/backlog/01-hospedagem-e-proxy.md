@@ -1,6 +1,6 @@
 ---
 titulo: Decidir e montar como a TV acessa o app (hospedagem + proxy)
-labels: tipo:infra, prioridade:p1, estado:pronto, area:infra
+labels: tipo:infra, prioridade:p1, estado:todo, area:infra
 ---
 ## Contexto
 Hoje o app só funciona no computador do Cadu: o `servidor.py` (Python) serve as telas e busca a lista do provedor (o navegador sozinho é bloqueado por CORS). A TV não roda Python. Sem resolver isso o objetivo (assistir na TV) não fecha.

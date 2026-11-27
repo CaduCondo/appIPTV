@@ -1,6 +1,6 @@
 ---
 titulo: Player: tocar mais formatos e canais ao vivo (HLS) com segurança
-labels: tipo:feature, prioridade:p1, estado:pronto, area:player
+labels: tipo:feature, prioridade:p1, estado:todo, area:player
 ---
 ## Contexto
 O player usa o `<video>` do navegador. Arquivos `.mkv` e fluxos `.ts` muitas vezes não tocam, e canais ao vivo (`.m3u8`) dependem de CORS. Hoje só há uma mensagem de erro e não há teste que prove que o vídeo toca.

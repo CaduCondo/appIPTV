@@ -1,6 +1,6 @@
 ---
 titulo: Desempenho com listas enormes (dezenas de milhares de itens)
-labels: tipo:bug, prioridade:p1, estado:pronto, area:catalogo
+labels: tipo:bug, prioridade:p1, estado:todo, area:catalogo
 ---
 ## Contexto
 Listas reais têm algo como 44 mil filmes e 9 mil séries. Cada tela lê o catálogo inteiro do navegador e a importação baixa tudo de uma vez, sem barra de progresso real. Na TV isso pode travar ou demorar muito. Ainda não foi medido com volume real.

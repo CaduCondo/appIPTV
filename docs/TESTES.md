@@ -1,5 +1,18 @@
 # Testes
 
+## Estratégia (pirâmide)
+
+| Tipo | Ferramenta | Onde | Roda |
+|---|---|---|---|
+| Unitário (regras de negócio) | `node --test` | `tests/unit` | todo push/PR |
+| Funcional / regressão (BDD) | Robot Framework + Playwright (Python), **Page Objects** | `tests/robot` | todo push/PR |
+| Integração (app + banco com RLS) | Robot/pytest contra Supabase de teste | `tests/integration` | PR |
+| Segurança / pentest | testes de RLS e API que devem falhar, OWASP ZAP | `tests/security` | PR + antes de publicar |
+| Carga e estresse | k6 | `tests/load` | manual/agendado + antes de publicar |
+| Homologação | ambiente de prévia na Vercel | — | todo PR |
+
+Escrita dos cenários sempre em **BDD** (Dado/Quando/Então). Page Objects: cada tela tem uma classe com seus elementos e ações; os cenários só falam a linguagem do negócio.
+
 ## Rodar tudo
 
 ```

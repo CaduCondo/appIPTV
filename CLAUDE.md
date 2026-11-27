@@ -17,9 +17,28 @@
 
 - **Cinema Livre**: app para assistir filmes, séries e TV ao vivo a partir de uma **lista** que o usuário importa (painel Xtream com usuário e senha, link M3U ou arquivo .m3u). Feito primeiro para TV (controle remoto), mas funciona no navegador.
 - Telas prontas: login/importar lista, perfis, home (hub), listagem de Filmes/Séries/TV ao Vivo (categorias à esquerda, pôsteres à direita), detalhe de filme/série (elenco, temporadas, episódios), player, favoritos/histórico, contas. A tela de ator é só um modelo estático (`modelo-ator.html`).
-- Stack: HTML + JavaScript puro + React (arquivos locais em `js/`, sem build), componentes em `js/bundle.js`/`css/bundle.css` (design system "Cinema Livre"), dados no navegador (localStorage + IndexedDB). `servidor.py` serve o app e faz o proxy `/proxy?url=` (evita o bloqueio CORS dos provedores).
+- Stack hoje: HTML + JavaScript puro + React (arquivos locais em `js/`, sem build), componentes em `js/bundle.js`/`css/bundle.css` (design system "Cinema Livre"), dados no navegador (localStorage + IndexedDB). `servidor.py` serve o app e faz o proxy `/proxy?url=` (evita o bloqueio CORS dos provedores).
 - Design system: https://claude.ai/artifact/L9nrpLdS1CPqMBYFFa9MDV (tokens, componentes, 3 telas de exemplo). O que mudar em `js/bundle.js` ou `css/bundle.css` deve ser refletido lá.
 - Repositório: https://github.com/CaduCondo/appIPTV
+
+## Visão de engenharia (pedido do Cadu, 27/nov/2026)
+
+Processo de desenvolvimento muito bem feito, com as melhores ferramentas. Detalhe em `docs/PROCESSO.md`, `docs/SEGURANCA.md`, `docs/ARQUITETURA.md`, `docs/REGRAS_DE_NEGOCIO.md`, `docs/TESTES.md`.
+
+- **Ferramentas:** GitHub (código, issues, Actions), Supabase (banco, login, RLS, funções), Vercel (hospedagem do site e funções; publica sozinha a versão aprovada). O Cadu já tem 2 projetos no Supabase e talvez não possa criar mais: se faltar, propor outra conta/e-mail ou outra ferramenta (decisão dele).
+- **Segurança em primeiro lugar** ("não pode ser invadido"): senhas só como hash, rotas de API com login, limite de tentativas, **RLS em toda tabela**, mensagem de erro de login **sempre igual** (nunca dizer se errou usuário ou senha), nenhum segredo no repositório (a senha do admin não entra em código, docs ou testes). Honestidade: nenhum sistema é 100% invulnerável; reduzimos risco em camadas e testamos sempre.
+- **Testes:** unitários, funcionais, integração, homologação, **regressão**, segurança/pentest, carga e estresse, sempre escritos em **BDD**, com **Page Objects** nos testes de tela. A regressão roda no CI e **só vai para produção se o CI passar**.
+- **TDD:** escrever o teste antes do código.
+- **Código:** sempre **comentado** (em português, explicando o porquê), o mais **orientado a objeto** possível, **reusando** o máximo e **refatorando** sempre (nunca acumular dívida até a refatoração ficar inviável). Regras de negócio em módulos puros (`js/rules.js`), telas só chamam.
+- **Documentação:** toda regra de negócio nova ou alterada vai para `docs/REGRAS_DE_NEGOCIO.md` no mesmo PR.
+- **Esteira da issue (colunas do quadro):** `BACKLOG → TO-DO → WIP → WTT → DONE → IN`. WIP = desenvolvendo; WTT = Working on The Tests; DONE = CI verde e mergeado; IN = em produção e conferido (**aí a issue fecha**). Só avança com a evidência da coluna; teste que falha volta a issue para WIP.
+- **Issue com o melhor conteúdo:** cenário, teste, resultado esperado, resultado obtido (bug), BDD, tudo ligado. Erro achado vira issue com gravidade e um teste que o impede de voltar.
+
+## Regras de interface (pedido do Cadu)
+
+- **Nunca barra de rolagem lateral:** onde a lista não cabe, usar **carrossel** (componente `Carousel`).
+- Layout simples, bonito e fácil de entender, juntando as melhores ideias de vários apps; foco nas 3 funções principais: **TV ao Vivo, Filmes, Séries**.
+- Nota sempre no formato "X,XX" (duas casas, vírgula).
 
 ## Regra de conteúdo (importante)
 
@@ -59,18 +78,18 @@ O Cadu não vai ficar pedindo passo a passo. O Claude toca o backlog do início 
 1. **Escolher o próximo item** do backlog (issues abertas), combinando valor, esforço, risco e urgência — não só a ordem em que o Cadu foi citando.
 2. **Todo trabalho nasce como issue** (com etiqueta e, quando o quadro existir, no Project) **antes** de mexer no código. Uma issue = um assunto.
 3. **Preencher a issue enquanto analisa:** contexto, causa raiz, impacto, tarefas e **critérios de aceitação em BDD** (Dado/Quando/Então).
-4. **Implementar** numa branch `tipo/N-assunto` (ex.: `fix/12-player-mkv`), marcando a issue como `estado:andamento` (no máximo 2 ao mesmo tempo).
+4. **Implementar** numa branch `tipo/N-assunto` (ex.: `fix/12-player-mkv`), marcando a issue como `estado:wip` (no máximo 2 ao mesmo tempo).
 5. **Testar localmente:** `npm run test:unit` e `npm run test:bdd` (Robot Framework). Cenário novo para o que foi feito; bug corrigido ganha cenário que o teria pego.
 6. **Commitar** (um commit por assunto, mensagem em português, `Refs #N`) e **dar push**.
-7. **Abrir o Pull Request** e mover a issue para `estado:teste`. Conferir o **GitHub Actions** (unit → smoke → regressão). Não segue com vermelho.
+7. **Abrir o Pull Request** e mover a issue para `estado:wtt`. Conferir o **GitHub Actions** (unit → smoke → regressão). Não segue com vermelho.
 8. **Se o Actions achar defeito do SISTEMA:** criar issue nova (contexto, causa, gravidade, BDD, link do run/vídeo), colocar na fila pela gravidade (dinheiro/dado perdido/entrada no app quebrada no topo). **Defeito do TESTE:** corrigir o teste.
-9. **Merge** com tudo verde, **fechar a issue** com um comentário simples do que foi feito e `estado:feito`.
+9. **Merge** com tudo verde, `estado:done`; depois de publicado e conferido no ar, `estado:in-production` e **fechar a issue** com um comentário simples do que foi feito.
 10. **Checar documentação e testes — sempre, sem exceção:** README/`docs/` desatualizados? documento duplicado? manual passo a passo do Cadu (`docs/COMECAR_AQUI.md`) reflete a tela de verdade? cenário BDD cobre o que mudou? Se um teste já existia e não pegou o bug, descobrir por quê e corrigir a causa.
 11. **Escolher e sinalizar o próximo item** e recomeçar — sem esperar o Cadu perguntar "qual o próximo?".
 
 ### Backlog sempre priorizado
 
-- Toda issue aberta tem etiqueta `prioridade:*` e `estado:*`. A ordem da fila é **P0 > P1 > P2 > P3** e, dentro de cada uma, o número de ordem em `docs/ROADMAP.md`.
+- Toda issue aberta tem etiqueta `prioridade:*` e `estado:*` (`backlog`, `todo`, `wip`, `wtt`, `done`, `in-production`, `bloqueado`). A ordem da fila é **P0 > P1 > P2 > P3** e, dentro de cada uma, o número de ordem em `docs/ROADMAP.md`.
 - Item novo (bug achado, pedido do Cadu, falha do Actions) entra reavaliando a fila inteira, não só no fim.
 - `docs/PEDIDOS-E-DECISOES.md` guarda tudo que o Cadu pediu e decidiu (telas, regras). Atualizar sempre que ele pedir ou decidir algo novo.
 

@@ -27,3 +27,28 @@ Registro do que foi pedido e decidido, em ordem. O Claude atualiza este arquivo 
 
 - Cadu quer abrir e navegar pelo app, mesmo com conteúdo mockado, para ir ajustando o visual. Decisão: demonstração publicada no GitHub Pages (https://caducondo.github.io/appIPTV/) e catálogo de exemplo maior (issue #17).
 - Cadu quer respostas curtas e diretas, só com o importante e as decisões dele (issue #16, regra no `CLAUDE.md`).
+
+## 27/nov/2026 — processo, segurança e sistema de usuários
+
+### Processo e engenharia (pedido)
+- Processo de desenvolvimento "muito bem feito" com as melhores ferramentas; GitHub (código/issues/Actions), Supabase (banco; já tem 2 projetos, talvez não possa criar mais — pode usar outros e-mails/contas ou outra ferramenta), Vercel.
+- Segurança forte: senhas criptografadas, rotas de API com autenticação, limite de tentativas de login, RLS nas tabelas. "Não pode ser invadido de jeito nenhum" → ver `docs/SEGURANCA.md`.
+- Testes: unitários, funcionais, carga, estresse, pentest, em BDD, com Page Objects; TDD; código comentado, orientado a objeto, reuso e refatoração contínua; regras de negócio documentadas.
+- Esteira da issue: **BACKLOG → TO-DO → WIP → WTT → DONE → IN (In Production)**. Só publica se o CI passar; erro vira issue e ganha teste para nunca voltar.
+
+### Tela de login (pedido)
+- Usuário e senha. Usuário automático de 6 números e senha de 6 números; manual com 11 números (telefone). Usuário é chave única.
+- Controlar onde o app foi instalado e se está online (limite de telas ao mesmo tempo, que o administrador define). MAC não dá para ler: usar código do aparelho (ver `docs/REGRAS_DE_NEGOCIO.md`).
+- Administrador: usuário `010101`, plano Grátis, sem limite de dispositivos, com botão **Criar usuário** na home. A senha dele **não** vai para o repositório.
+- Criação de usuário: automático/manual → plano (Grátis, Degustação 2h, Mensal, Trimestral, Semestral, Anual, 2 Anos, 3 Anos) → telas (1 a 5; Degustação é 1) → Criar → **Compartilhar por WhatsApp** com mensagem pronta.
+- Mensagens de erro de login sempre iguais (não dizer qual errou); tratar todas as possibilidades. Tem **Esqueci minha senha** (método escolhido: código por e-mail + redefinição pelo administrador).
+- Futuro: usuário recarrega o plano sozinho com **Pix** automático; planos empilham (novo começa quando o atual acaba).
+
+### Perfil e favoritos (pedido)
+- Perfil só separa favoritos (TV ao Vivo, Filmes, Séries). Decisão do Claude: salvar **no banco**, ligado a usuário+perfil (vale em qualquer aparelho), com cópia local.
+
+### Home (pedido)
+- Juntar o melhor de vários apps em layout simples e bonito, com foco em **TV online, Filmes e Séries**.
+- **Sem barra de rolagem lateral: usar carrossel.**
+- Botão **Perfil** (Trocar perfil, Configurações, Ajustes, **Plano**: atual à esquerda, disponíveis à direita; sem Grátis/Degustação, só o administrador vê).
+- Bloco **Últimos adicionados** (10–20 títulos, filmes e séries; etiqueta "Filme"/"Série" no topo esquerdo, nota "X,XX" no topo direito). Bloco **Jogos do dia** (leva ao canal; antes do início mostra o horário).
