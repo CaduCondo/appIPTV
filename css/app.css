@@ -7,8 +7,6 @@ h1, h2, h3 { margin: 0; }
 .h-sec { font: 600 28px/34px var(--font-display); margin: 24px 0 8px; }
 .muted { color: var(--ink-muted); }
 .row { display: flex; gap: 8px; }
-.row-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 6px; margin: -6px; scrollbar-width: thin; }
-.row-scroll > * { flex: none; }
 .btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .hidden { display: none !important; }
 .msg { padding: 12px 16px; border-radius: var(--radius-md); background: var(--surface-200); border: 2px solid var(--line-strong); font: 500 16px/22px var(--font-sans); }
@@ -113,3 +111,12 @@ body.player { background: #000; }
 .result { max-width: 560px; display: flex; flex-direction: column; gap: 12px; padding: 24px; border-radius: var(--radius-lg); border: 2px solid var(--brand); background: var(--surface-200); }
 .result .big { font: 700 40px/46px var(--font-display); letter-spacing: .1em; }
 .result .lbl { font: 600 14px/18px var(--font-sans); color: var(--ink-muted); }
+
+/* home nova */
+.hub3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 4px; }
+.hub3 .cl-hub, .hub3 .cl-hub--big { min-height: 150px; padding: 18px 20px; }
+.hub3 .cl-hub__title { font-size: 28px; line-height: 34px; }
+.hub3 .cl-hub__sub { font-size: 16px; }
+.bloco { margin-top: 26px; }
+.bloco .cl-carousel__title { font-size: 14px; }
+.plano { display: grid; grid-template-columns: 420px 1fr; gap: 32px; align-items: start; }

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark"><head><meta charset="utf-8"><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="css/tokens.css"><link rel="stylesheet" href="css/bundle.css"><link rel="stylesheet" href="css/app.css"><script src="js/react.production.min.js"></script><script src="js/react-dom.production.min.js"></script><script src="js/bundle.js"></script><script src="js/catalog.js"></script><script src="js/rules.js"></script><script src="js/auth.js"></script><script src="js/app.js"></script><script src="js/demo.js"></script><title>Plano · Cinema Livre</title></head>
+<body><div class="page"><div id="root"></div></div>
+<script>
+/* Plano: à esquerda o plano atual (e os próximos); à direita os planos disponíveis.
+   Grátis e Degustação só o administrador vê. Regras: js/rules.js e docs/REGRAS_DE_NEGOCIO.md */
+if (!CL.guard(true)) throw new Error('redirect');
+var h = React.createElement, C = window.CinemaLivre, R = window.CLRules;
+var DUR = { gratis: 'para sempre', degustacao: '2 horas', mensal: '1 mês', trimestral: '3 meses', semestral: '6 meses', anual: '1 ano', '2anos': '2 anos', '3anos': '3 anos' };
+
+function quando(d) { return d ? R.dataBR(d) : 'para sempre'; }
+
+function App() {
+  var s = React.useState({ plano: null, telas: 1, msg: '', erro: '', n: 0 }), st = s[0];
+  function set(p) { s[1](function (o) { return Object.assign({}, o, p); }); }
+  var papel = CL.isAdmin() ? 'admin' : 'cliente';
+  var atual = CL.auth.planoAtual(), periodos = CL.auth.periodos(), agora = new Date();
+  var futuros = periodos.filter(function (p) { return p.inicio.getTime() > agora.getTime(); });
+
+  function contratar() {
+    if (!st.plano) return;
+    CL.auth.contratar({ plano: st.plano, telas: st.telas }).then(function (r) {
+      if (!r.ok) return set({ erro: 'Não foi possível contratar este plano.', msg: '' });
+      set({ erro: '', n: st.n + 1, msg: 'Plano ' + R.PLANOS[st.plano].nome + ' registrado: começa em ' + quando(r.periodo.inicio) + '. (Modo de teste: o pagamento por Pix será gerado aqui depois.)' });
+    });
+  }
+
+  return h('div', null,
+    h('div', { className: 'topbar' }, h('h1', { className: 'h-title' }, 'Plano'), h('div', { className: 'btns' }, h(C.ActionButton, { icon: 'back', onClick: function () { location.href = 'perfil.html'; } }, 'Perfil'), h(C.ActionButton, { icon: 'home', onClick: function () { location.href = 'home.html'; } }, 'Início'))),
+    h('div', { className: 'plano' },
+      h('div', { className: 'plano__atual' },
+        h('div', { className: 'sec-label', style: { marginTop: 0 } }, 'Seu plano atual'),
+        atual
+          ? h('div', { className: 'result', style: { maxWidth: 'none' } },
+            h('div', { className: 'big', id: 'plano-atual' }, R.PLANOS[atual.plano].nome),
+            h('div', { className: 'muted' }, (CL.isAdmin() ? 'Sem limite de telas' : atual.telas + ' tela(s) ao mesmo tempo') + ' · válido até ' + quando(atual.fim)))
+          : h('div', { className: 'msg err' }, 'Você não tem um plano ativo. Escolha um plano ao lado.'),
+        futuros.length > 0 && h('div', { style: { marginTop: 16 } },
+          h('div', { className: 'sec-label' }, 'Próximos planos'),
+          futuros.map(function (p, i) { return h('div', { key: i, className: 'msg', style: { marginBottom: 8 } }, 'Plano ' + R.PLANOS[p.plano].nome + ' · ' + p.telas + ' tela(s) · começa em ' + quando(p.inicio) + ' · até ' + quando(p.fim)); }))),
+      h('div', { className: 'plano__lista' },
+        h('div', { className: 'sec-label', style: { marginTop: 0 } }, 'Planos disponíveis'),
+        h('div', { className: 'choices', style: { gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' } }, R.planosDisponiveis(papel).map(function (p) {
+          return h('button', { key: p.id, type: 'button', className: 'choice' + (st.plano === p.id ? ' is-on' : ''), onClick: function () { set({ plano: p.id, telas: p.id === 'degustacao' ? 1 : st.telas, msg: '' }); } }, h('b', null, p.nome), h('span', null, DUR[p.id]));
+        })),
+        st.plano && st.plano !== 'degustacao' && h('div', { style: { marginTop: 16 } },
+          h('div', { className: 'sec-label' }, 'Quantas telas ao mesmo tempo?'),
+          h('div', { className: 'choices five' }, [1, 2, 3, 4, 5].map(function (n) {
+            return h('button', { key: n, type: 'button', className: 'choice' + (st.telas === n ? ' is-on' : ''), onClick: function () { set({ telas: n }); } }, h('b', null, n + (n === 1 ? ' Tela' : ' Telas')));
+          }))),
+        st.erro && h('div', { className: 'msg err', role: 'alert', style: { marginTop: 12 } }, st.erro),
+        st.msg && h('div', { className: 'msg ok', role: 'status', style: { marginTop: 12 } }, st.msg),
+        st.plano && h('div', { style: { marginTop: 16 } }, h(C.ActionButton, { variant: 'primary', icon: 'check', onClick: contratar }, 'Contratar')))));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+CL.initNav();
+</script></body></html>

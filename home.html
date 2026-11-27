@@ -3,71 +3,93 @@
 <body>
 <div class="page"><div id="root"></div></div>
 <script>
+/* Home: foco em TV ao Vivo, Filmes e Séries. Listas que não cabem viram CARROSSEL (nunca barra de rolagem lateral). */
 if (!CL.guard(true)) throw new Error('redirect');
 var h = React.createElement, C = window.CinemaLivre;
 var meta = CL.meta(), prof = CL.profile(), counts = meta.counts || {};
 var DEMO = meta.kind === 'demo';
 if (DEMO && CL.seedDemoHistory) CL.seedDemoHistory();
-var GAMES = [['Campeonato de Exemplo', 'Atlético Norte', 2, 'Real Sul', 1, 'Encerrado'], ['Copa de Exemplo', 'União FC', 0, 'Porto Azul', 0, 'Ao vivo · 62\''], ['Campeonato de Exemplo', 'Estrela do Vale', '', 'Nacional EC', '', 'Hoje · 20:30'], ['Liga de Exemplo', 'Costa Verde', '', 'Montanha FC', '', 'Hoje · 22:00']];
 
-function goItem(t, x) { location.href = 'detalhe.html?t=' + t + '&id=' + encodeURIComponent(x.id); }
+function hora(ms) { var d = new Date(ms); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+
+/* Jogos de EXEMPLO (só na demonstração): horários relativos a agora para mostrar os dois casos. */
+function jogosDeExemplo() {
+  var agora = Date.now(), m = 60000;
+  return [
+    { liga: 'Campeonato de Exemplo', a: 'Atlético Norte', b: 'Real Sul', placar: '2 x 1', inicio: agora - 70 * m, canal: 'l1' },
+    { liga: 'Copa de Exemplo', a: 'União FC', b: 'Porto Azul', placar: '0 x 0', inicio: agora - 20 * m, canal: 'l1' },
+    { liga: 'Campeonato de Exemplo', a: 'Estrela do Vale', b: 'Nacional EC', inicio: agora + 120 * m, canal: 'l2' },
+    { liga: 'Liga de Exemplo', a: 'Costa Verde', b: 'Montanha FC', inicio: agora + 300 * m, canal: 'l2' }
+  ];
+}
+
 function Wide(props) {
   var x = props.x;
-  return h('button', { type: 'button', className: 'wide-card', onClick: props.onClick },
+  return h('button', { type: 'button', className: 'wide-card', style: { width: '100%' }, onClick: props.onClick },
     x.p ? h('img', { src: x.p, alt: '', loading: 'lazy', onError: function (e) { e.target.style.display = 'none'; } }) : null,
     h('span', { className: 'kind' }, props.kind),
     h('span', { className: 'cap' }, props.title || x.n),
     props.progress ? h('span', { className: 'bar', style: { width: props.progress + '%' } }) : null);
 }
+
 function App() {
-  var s = React.useState(new Date()); var now = s[0];
-  React.useEffect(function () { var i = setInterval(function () { s[1](new Date()); }, 30000); return function () { clearInterval(i); }; }, []);
+  var s = React.useState({ now: new Date(), aviso: '' }), st = s[0];
+  function set(p) { s[1](function (o) { return Object.assign({}, o, p); }); }
+  React.useEffect(function () { var i = setInterval(function () { set({ now: new Date() }); }, 30000); return function () { clearInterval(i); }; }, []);
+
   var hist = CL.history().slice(0, 12);
-  var recent = [].concat((meta.recent && meta.recent.movie || []).slice(0, 8).map(function (x) { return { t: 'movie', x: x }; }), (meta.recent && meta.recent.series || []).slice(0, 8).map(function (x) { return { t: 'series', x: x }; })).sort(function (a, b) { return (b.x.a || 0) - (a.x.a || 0); }).slice(0, 12);
-  var favN = CL.favs().length;
-  var status = meta.exp ? (meta.exp * 1000 < Date.now() ? 'Lista vencida em ' + CL.fmtDate(meta.exp) : 'Lista válida até ' + CL.fmtDate(meta.exp)) : (meta.kind === 'demo' ? 'Modo demonstração' : 'Lista importada');
+  var rec = meta.recent || {};
+  var ultimos = [].concat((rec.movie || []).map(function (x) { return { t: 'movie', x: x }; }), (rec.series || []).map(function (x) { return { t: 'series', x: x }; }))
+    .sort(function (a, b) { return (b.x.a || 0) - (a.x.a || 0); }).slice(0, 20);
+  var jogos = DEMO ? jogosDeExemplo() : [];
+
+  function abrirJogo(j) {
+    if (Date.now() < j.inicio) return set({ aviso: 'O jogo ' + j.a + ' x ' + j.b + ' começa às ' + hora(j.inicio) + '.' });
+    CL.loadKind('live').then(function (lista) {
+      var canal = lista.filter(function (c) { return c.id === j.canal; })[0];
+      var u = canal && CL.streamUrl('live', canal);
+      if (!u) return set({ aviso: 'Não achei o canal deste jogo.' });
+      location.href = 'player.html?' + new URLSearchParams({ u: u, title: j.a + ' x ' + j.b, p: '', t: 'live', id: canal.id, key: 'live:' + canal.id });
+    });
+  }
 
   return h('div', null,
     h('div', { className: 'topbar' },
-      h('div', { className: 'brand-mark' }, 'Cinema ', h('b', null, 'Livre')),
-      h('div', { className: 'muted', style: { font: '600 20px/26px var(--font-sans)' } }, now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })),
-      h('div', { className: 'btns' },
+      h('div', null, h('div', { className: 'brand-mark' }, 'Cinema ', h('b', null, 'Livre')),
+        h('div', { className: 'muted', style: { font: '600 16px/22px var(--font-sans)' } }, CL.greeting() + ', ' + prof.name + ' · ' + st.now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' + st.now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }))),
+      h('div', { className: 'btns', style: { alignItems: 'center' } },
+        DEMO && h('span', { className: 'badge-demo' }, 'Demonstração'),
         CL.isAdmin() && h(C.ActionButton, { variant: 'primary', icon: 'plus', onClick: function () { location.href = 'criar-usuario.html'; } }, 'Criar usuário'),
-        CL.isAdmin() && h(C.ActionButton, { icon: 'refresh', onClick: function () { location.href = 'contas.html?recarregar=1'; } }, 'Recarregar'),
-        h(C.ActionButton, { icon: 'settings', onClick: function () { location.href = 'embreve.html?t=Ajustes'; } }, 'Ajustes'),
-        h(C.ProfileItem, { name: prof.name, color: prof.color, onClick: function () { location.href = 'perfis.html'; } }))),
-    h('div', { className: 'hello' },
-      h('div', { style: { flex: 1 } }, h('div', { className: 't' }, CL.greeting() + ', ' + prof.name + '!'), h('div', { className: 'muted', style: { font: '500 18px/26px var(--font-sans)' } }, 'Escolha uma seção para começar a assistir.')),
-      h('span', { className: 'cl-chip' }, status)),
+        h(C.ProfileItem, { name: prof.name, color: prof.color, onClick: function () { location.href = 'perfil.html'; } }))),
 
-    hist.length > 0 && h('div', null, h('div', { className: 'sec-label' }, 'Continuar assistindo'),
-      h('div', { className: 'row-scroll' }, hist.map(function (e) {
-        return h(Wide, { key: e.key, x: { p: e.p, n: e.title }, kind: e.t === 'movie' ? 'Filme' : e.t === 'series' ? 'Série' : 'Canal', progress: e.dur ? Math.round(e.pos / e.dur * 100) : 0, title: e.title,
-          onClick: function () { location.href = e.t === 'live' ? 'player.html?key=' + encodeURIComponent(e.key) : 'player.html?key=' + encodeURIComponent(e.key) + '&resume=1'; } });
-      }))),
-
-    recent.length > 0 && h('div', null, h('div', { className: 'sec-label' }, 'Adicionados recentemente'),
-      h('div', { className: 'row-scroll' }, recent.map(function (r) {
-        return h(Wide, { key: r.t + r.x.id, x: r.x, kind: r.t === 'movie' ? 'Filme' : 'Série', onClick: function () { goItem(r.t, r.x); } });
-      }))),
-
-    h('div', { className: 'sec-label' }, 'Jogos do dia', DEMO && h('span', { className: 'badge-demo', style: { marginLeft: 10 } }, 'Exemplo')),
-    DEMO ? h('div', { className: 'row-scroll' }, GAMES.map(function (g, i) {
-      return h('button', { key: i, type: 'button', className: 'match', onClick: function () { location.href = 'embreve.html?t=Jogos do dia'; } },
-        h('span', { className: 'match__league' }, g[0]),
-        h('span', { className: 'match__teams' }, h('b', null, g[1]), h('span', { className: 'match__score' }, g[2] === '' ? 'x' : g[2] + ' x ' + g[4]), h('b', null, g[3])),
-        h('span', { className: 'match__status' }, g[5]));
-    })) : h('div', { className: 'soon' }, h(C.Icon, { name: 'live', size: 24 }), 'Em breve: placares e transmissões dos jogos do dia.'),
-
-    h('div', { className: 'hub' },
+    h('div', { className: 'hub3' },
       h(C.HubTile, { big: true, icon: 'live', title: 'TV ao Vivo', subtitle: CL.num(counts.live) + ' canais', onClick: function () { location.href = 'tv.html'; } }),
       h(C.HubTile, { icon: 'film', title: 'Filmes', subtitle: CL.num(counts.movie) + ' títulos', onClick: function () { location.href = 'filmes.html'; } }),
-      h(C.HubTile, { icon: 'series', title: 'Séries', subtitle: CL.num(counts.series) + ' séries', onClick: function () { location.href = 'series.html'; } }),
-      h(C.HubTile, { icon: 'heart', title: 'Favoritos', subtitle: favN + (favN === 1 ? ' item' : ' itens'), onClick: function () { location.href = 'favoritos.html'; } }),
-      h(C.HubTile, { icon: 'user', title: 'Contas', subtitle: 'Suas listas', onClick: function () { location.href = 'contas.html'; } }),
-      h(C.HubTile, { icon: 'history', title: 'Histórico', subtitle: CL.history().length + ' itens', onClick: function () { location.href = 'favoritos.html?h=1'; } }),
-      h(C.HubTile, { icon: 'settings', title: 'Ajustes', subtitle: 'Preferências', onClick: function () { location.href = 'embreve.html?t=Ajustes'; } }))
-  );
+      h(C.HubTile, { icon: 'series', title: 'Séries', subtitle: CL.num(counts.series) + ' séries', onClick: function () { location.href = 'series.html'; } })),
+
+    ultimos.length > 0 && h('div', { className: 'bloco' },
+      h(C.Carousel, { titulo: 'Últimos adicionados', perPage: 6 }, ultimos.map(function (r) {
+        return h(C.PosterCard, { key: r.t + r.x.id, title: r.x.n, year: r.x.y || undefined, rating: r.x.r || undefined, src: r.x.p, kind: r.t === 'movie' ? 'Filme' : 'Série', onClick: function () { location.href = 'detalhe.html?t=' + r.t + '&id=' + encodeURIComponent(r.x.id); } });
+      }))),
+
+    hist.length > 0 && h('div', { className: 'bloco' },
+      h(C.Carousel, { titulo: 'Continuar assistindo', perPage: 4 }, hist.map(function (e) {
+        return h(Wide, { key: e.key, x: { p: e.p, n: e.title }, kind: e.t === 'movie' ? 'Filme' : e.t === 'series' ? 'Série' : 'Canal', progress: e.dur ? Math.round(e.pos / e.dur * 100) : 0, title: e.title,
+          onClick: function () { location.href = 'player.html?key=' + encodeURIComponent(e.key) + (e.t === 'live' ? '' : '&resume=1'); } });
+      }))),
+
+    h('div', { className: 'bloco' },
+      jogos.length > 0
+        ? h('div', null,
+          st.aviso && h('div', { className: 'msg', role: 'status', style: { marginBottom: 10 } }, st.aviso),
+          h(C.Carousel, { titulo: 'Jogos do dia', selo: h('span', { className: 'badge-demo' }, 'Exemplo'), perPage: 4 }, jogos.map(function (j, i) {
+            var comecou = Date.now() >= j.inicio;
+            return h('button', { key: i, type: 'button', className: 'match', style: { width: '100%' }, onClick: function () { abrirJogo(j); } },
+              h('span', { className: 'match__league' }, j.liga),
+              h('span', { className: 'match__teams' }, h('b', null, j.a), h('span', { className: 'match__score' }, comecou ? j.placar : 'x'), h('b', null, j.b)),
+              h('span', { className: 'match__status' }, comecou ? 'Ao vivo · toque para assistir' : 'Começa às ' + hora(j.inicio)));
+          })))
+        : h('div', null, h('div', { className: 'sec-label', style: { marginTop: 0 } }, 'Jogos do dia'), h('div', { className: 'soon' }, h(C.Icon, { name: 'live', size: 24 }), 'Em breve: placares e transmissões dos jogos do dia.'))));
 }
 ReactDOM.createRoot(document.getElementById('root')).render(h(App));
 CL.initNav();

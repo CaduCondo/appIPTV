@@ -80,16 +80,17 @@ function App() {
           h(C.ActionButton, { icon: 'speaker', onClick: listen }, st.speaking ? 'Parar' : 'Ouvir')))),
 
     st.rel && h('div', null, h('h2', { className: 'h-sec' }, 'Relacionadas'),
-      st.related.length ? h('div', { className: 'row-scroll' }, st.related.map(function (x) {
-        return h('div', { key: x.id, style: { width: 150 } }, h(C.PosterCard, { title: x.n, year: x.y || undefined, rating: x.r || undefined, src: x.p, onClick: function () { location.href = 'detalhe.html?t=' + T + '&id=' + encodeURIComponent(x.id); } }));
-      })) : h('div', { className: 'msg' }, 'Nada parecido nesta lista.')),
+      st.related.length ? h(C.Carousel, { perPage: 6 }, st.related.map(function (x) {
+        return h(C.PosterCard, { key: x.id, title: x.n, year: x.y || undefined, rating: x.r || undefined, src: x.p, onClick: function () { location.href = 'detalhe.html?t=' + T + '&id=' + encodeURIComponent(x.id); } });
+      }))
+        : h('div', { className: 'msg' }, 'Nada parecido nesta lista.')),
 
     cast.length > 0 && h('div', null, h('h2', { className: 'h-sec' }, 'Elenco'),
-      h('div', { className: 'row-scroll' }, cast.slice(0, 16).map(function (c, i) { return h(C.CastAvatar, { key: i, name: c.name, character: c.character, src: c.img || undefined }); }))),
+      h(C.Carousel, { perPage: 8 }, cast.slice(0, 16).map(function (c, i) { return h(C.CastAvatar, { key: i, name: c.name, character: c.character, src: c.img || undefined }); }))),
 
     T === 'series' && keys.length > 0 && h('div', null, h('h2', { className: 'h-sec' }, 'Episódios'),
       h(C.SeasonTabs, { seasons: keys.map(function (k) { return { label: 'Temporada ' + (k.length < 2 ? '0' + k : k), episodes: eps[k].length }; }), active: Math.max(0, keys.indexOf(sk)), onSelect: function (i) { set({ season: i }); } }),
-      h('div', { className: 'row-scroll', style: { marginTop: 8 } }, (eps[sk] || []).map(function (e) {
+      h(C.Carousel, { key: 'ep' + sk, perPage: 4 }, (eps[sk] || []).map(function (e) {
         return h(C.EpisodeCard, { key: e.id, season: Number(sk), number: e.num, title: e.title, synopsis: e.plot, still: e.img || undefined, progress: CL.progressOf('series:' + item.id + ':' + e.id) || undefined, onClick: function () { play(e, sk); } });
       }))),
     T === 'series' && keys.length === 0 && h('div', { className: 'msg', style: { marginTop: 16 } }, 'Carregando episódios…')
