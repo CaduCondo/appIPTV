@@ -246,3 +246,35 @@ test('só retoma o vídeo se já passou de 2 segundos e não está nos últimos 
   assert.equal(R.posicaoParaRetomar({ pos: 95, dur: 100 }), 0);
   assert.equal(R.posicaoParaRetomar(null), 0);
 });
+
+// ---------- responsividade (issue #43) ----------
+test('regime de tela: TV/computador, tablet e celular', () => {
+  assert.equal(R.regimeDeTela(1280, 720), 'tv');
+  assert.equal(R.regimeDeTela(1920, 1080), 'tv');
+  assert.equal(R.regimeDeTela(3840, 2160), 'tv');
+  assert.equal(R.regimeDeTela(1024, 768), 'tv');
+  assert.equal(R.regimeDeTela(960, 540), 'tablet');   // TV Full HD com tela "dobrada" (960 px de CSS)
+  assert.equal(R.regimeDeTela(768, 1024), 'tablet');
+  assert.equal(R.regimeDeTela(844, 390), 'tablet');   // celular deitado
+  assert.equal(R.regimeDeTela(600, 900), 'tablet');
+  assert.equal(R.regimeDeTela(599, 900), 'phone');
+  assert.equal(R.regimeDeTela(390, 844), 'phone');
+  assert.equal(R.regimeDeTela(360, 740), 'phone');
+});
+
+test('fator de ampliação da TV: 1280 px = 1x, 4K = 3x, com teto', () => {
+  assert.equal(R.fatorDeZoom(1280), 1);
+  assert.equal(R.fatorDeZoom(1920), 1.5);
+  assert.equal(R.fatorDeZoom(3840), 3);
+  assert.equal(R.fatorDeZoom(7680), 3);
+});
+
+test('itens por página do carrossel mudam com o regime', () => {
+  assert.equal(R.itensPorPagina(6, 'tv'), 6);
+  assert.equal(R.itensPorPagina(6, 'tablet'), 4);
+  assert.equal(R.itensPorPagina(6, 'phone'), 2);
+  assert.equal(R.itensPorPagina(4, 'phone'), 2);
+  assert.equal(R.itensPorPagina(1, 'phone'), 1);
+  assert.equal(R.itensPorPagina({ tv: 5, tablet: 3, phone: 1 }, 'phone'), 1);
+  assert.equal(R.itensPorPagina({ tv: 5, tablet: 3 }, 'phone'), 5);
+});
