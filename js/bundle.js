@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"CinemaLivre","components":[{"name":"Icon"},{"name":"RatingBadge"},{"name":"PosterCard"},{"name":"CategoryMenu"},{"name":"MetaChips"},{"name":"CastAvatar"},{"name":"SeasonTabs"},{"name":"EpisodeCard"},{"name":"ActionButton"},{"name":"Field"},{"name":"ProfileItem"},{"name":"HubTile"},{"name":"DigitField"},{"name":"NumericKeypad"},{"name":"Carousel"}]} */
+/* @ds-bundle: {"format":4,"namespace":"CinemaLivre","components":[{"name":"Icon"},{"name":"RatingBadge"},{"name":"PosterCard"},{"name":"CategoryMenu"},{"name":"MetaChips"},{"name":"CastAvatar"},{"name":"SeasonTabs"},{"name":"EpisodeCard"},{"name":"ActionButton"},{"name":"Field"},{"name":"ProfileItem"},{"name":"HubTile"},{"name":"DigitField"},{"name":"NumericKeypad"},{"name":"Carousel"},{"name":"Select"}]} */
 (function () {
   var h = React.createElement;
 
@@ -137,7 +137,7 @@
               if (props.onSelect) props.onSelect(it.id);
             }
           },
-          it.label,
+          it.label + (it.n != null ? ' (' + Number(it.n).toLocaleString('pt-BR') + ')' : ''),
           it.count ? h('span', { className: 'cl-cat__count' }, it.count) : null
         );
       })
@@ -356,7 +356,7 @@
       (props.titulo || pages > 1) && h(
         'div',
         { className: 'cl-carousel__head' },
-        h('div', { className: 'cl-carousel__title' }, props.titulo, props.selo),
+        h('div', { className: 'cl-carousel__title' }, props.tituloHref ? h('a', { className: 'cl-carousel__link', href: props.tituloHref }, props.titulo, h(Icon, { name: 'next', size: 14 })) : props.titulo, props.selo),
         pages > 1 && h(
           'div',
           { className: 'cl-carousel__nav' },
@@ -371,7 +371,19 @@
     );
   }
 
+  /** Caixa de escolha (combo), ex.: ordenação da lista. options: [{ value, label }]. */
+  function Select(props) {
+    return h(
+      'label',
+      { className: cx('cl-select', props.className) },
+      props.label && h('span', { className: 'cl-select__label' }, props.label),
+      h('select', { className: 'cl-select__input', value: props.value, 'aria-label': props.label, onChange: function (e) { if (props.onChange) props.onChange(e.target.value); } },
+        (props.options || []).map(function (o) { return h('option', { key: o.value, value: o.value }, o.label); }))
+    );
+  }
+
   window.CinemaLivre = {
+    Select: Select,
     useRegime: useRegime,
     Carousel: Carousel,
     DigitField: DigitField,
