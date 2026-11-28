@@ -19,6 +19,8 @@
     var st = s[0];
     function set(p) { s[1](function (o) { return Object.assign({}, o, p); }); }
     var sentinel = React.useRef(null);
+    var regime = C.useRegime();
+    var menuAberto = React.useState(false), aberto = menuAberto[0], setAberto = menuAberto[1];
 
     React.useEffect(function () {
       Promise.all([CL.loadKind(KIND), CL.loadCats()]).then(function (r) { set({ items: r[0], cats: r[1][KIND] || [] }); });
@@ -68,10 +70,13 @@
           h(C.ActionButton, { icon: 'home', onClick: function () { location.href = 'home.html'; } }, 'Início'))),
       h('div', { className: 'list' },
         h('div', { className: 'list__side' },
+          regime !== 'tv' && h(C.ActionButton, { icon: 'film', onClick: function () { setAberto(!aberto); } }, 'Categorias · ' + activeLabel.replace(/^Busca: .*/, 'Busca')),
           st.search
             ? h(C.Field, { label: 'Buscar', value: st.q, placeholder: 'Nome…', autoFocus: true, onChange: function (v) { set({ q: v, limit: PAGE }); }, onKeyDown: function (e) { if (e.key === 'Escape') set({ search: false, q: '' }); } })
             : h(C.ActionButton, { icon: 'search', onClick: function () { set({ search: true }); } }, 'Buscar'),
-          h(C.CategoryMenu, { items: derived.menu, active: st.q ? '' : st.cat, onSelect: function (id) { CL.set('cat.' + KIND, id); set({ cat: id, q: '', limit: PAGE }); window.scrollTo(0, 0); } })),
+          regime === 'tv' || aberto
+            ? h(C.CategoryMenu, { items: derived.menu, active: st.q ? '' : st.cat, onSelect: function (id) { CL.set('cat.' + KIND, id); set({ cat: id, q: '', limit: PAGE }); setAberto(false); window.scrollTo(0, 0); } })
+            : null),
         h('div', null,
           h('div', { className: 'sec-label', style: { marginTop: 0 } }, activeLabel + ' · ' + CL.num(list.length) + ' ' + UNIT),
           list.length === 0

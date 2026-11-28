@@ -40,7 +40,7 @@ function App() {
           futuros.map(function (p, i) { return h('div', { key: i, className: 'msg', style: { marginBottom: 8 } }, 'Plano ' + R.PLANOS[p.plano].nome + ' · ' + p.telas + ' tela(s) · começa em ' + quando(p.inicio) + ' · até ' + quando(p.fim)); }))),
       h('div', { className: 'plano__lista' },
         h('div', { className: 'sec-label', style: { marginTop: 0 } }, 'Planos disponíveis'),
-        h('div', { className: 'choices', style: { gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' } }, R.planosDisponiveis(papel).map(function (p) {
+        h('div', { className: 'choices three' }, R.planosDisponiveis(papel).map(function (p) {
           return h('button', { key: p.id, type: 'button', className: 'choice' + (st.plano === p.id ? ' is-on' : ''), onClick: function () { set({ plano: p.id, telas: p.id === 'degustacao' ? 1 : st.telas, msg: '' }); } }, h('b', null, p.nome), h('span', null, DUR[p.id]));
         })),
         st.plano && st.plano !== 'degustacao' && h('div', { style: { marginTop: 16 } },

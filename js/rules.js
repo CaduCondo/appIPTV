@@ -337,7 +337,39 @@
     return h.pos;
   }
 
+  /* =====================================================================
+   * RESPONSIVIDADE (TV de vários tamanhos, tablet, celular)
+   * ===================================================================== */
+
+  /**
+   * Qual "regime" de layout usar:
+   *  - tv: tela grande (>= 1000 px de largura e >= 500 de altura): desenho de 1280 px ampliado para a tela;
+   *  - tablet: de 600 a 999 px (ou celular deitado): layout fluido com mais colunas;
+   *  - phone: abaixo de 600 px: layout fluido de uma/duas colunas.
+   */
+  function regimeDeTela(largura, altura) {
+    if (largura >= 1000 && altura >= 500) return 'tv';
+    return largura >= 600 ? 'tablet' : 'phone';
+  }
+
+  /** Quanto ampliar o desenho de 1280 px na TV (1 = tamanho original; teto 3x para 4K). */
+  function fatorDeZoom(largura) {
+    return Math.min(largura / 1280, 3);
+  }
+
+  /**
+   * Itens por página de um carrossel. `perPage` pode ser um número (valor da TV, reduzido
+   * automaticamente nos outros regimes) ou { tv, tablet, phone }.
+   */
+  function itensPorPagina(perPage, regime) {
+    if (typeof perPage === 'object' && perPage) return perPage[regime] != null ? perPage[regime] : perPage.tv;
+    if (regime === 'tablet') return Math.max(2, Math.round(perPage * 0.65));
+    if (regime === 'phone') return Math.max(1, Math.round(perPage * 0.4));
+    return perPage;
+  }
+
   var API = {
+    regimeDeTela: regimeDeTela, fatorDeZoom: fatorDeZoom, itensPorPagina: itensPorPagina,
     classificarErroDeMidia: classificarErroDeMidia, canalVizinho: canalVizinho, posicaoParaRetomar: posicaoParaRetomar,
     PLANOS: PLANOS, TELAS_MIN: TELAS_MIN, TELAS_MAX: TELAS_MAX, JANELA_ONLINE_MS: JANELA_ONLINE_MS, MENSAGENS: MENSAGENS,
     planosDisponiveis: planosDisponiveis, adicionarMeses: adicionarMeses, novoPeriodo: novoPeriodo, planoAtivo: planoAtivo,

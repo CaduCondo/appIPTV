@@ -62,6 +62,12 @@ Que estou na tela de criar usuário
     Que entrei como administrador
     App.Abrir Pagina    /criar-usuario.html
 
+Que estou num aparelho de ${l}x${a}
+    App.Abrir Contexto    ${l}    ${a}
+
+Que estou num celular de ${l}x${a}
+    App.Abrir Contexto    ${l}    ${a}    ${True}
+
 # ---------- Quando ----------
 Mexo o mouse
     App.Mexer O Mouse
@@ -77,6 +83,9 @@ Toco no jogo em andamento
 
 Toco no meu perfil
     App.Clicar No Elemento    .cl-profile
+
+Deslizo o dedo no carrossel "${titulo}"
+    App.Deslizar Carrossel    ${titulo}
 
 Entro com o usuário "${usuario}" e a senha "${senha}"
     App.Abrir Pagina    /entrar.html
@@ -148,6 +157,43 @@ Escolho a temporada "${nome}"
     App.Clicar No Elemento    .cl-season:has-text("${nome}")
 
 # ---------- Então ----------
+Percorro todas as telas e nada passa da largura
+    App.Abrir Pagina    /entrar.html
+    App.Conferir Sem Estouro
+    Entro com o usuário "010101" e a senha "123456"
+    App.Esperar Pagina    perfis.html
+    App.Conferir Sem Estouro
+    App.Preencher Campo    0    CaDu
+    App.Clicar No Botao    Salvar
+    App.Esperar Pagina    home.html
+    App.Conferir Sem Estouro
+    FOR    ${pagina}    IN    /filmes.html    /series.html    /tv.html    /perfil.html    /plano.html    /criar-usuario.html    /contas.html    /lista.html?trocar=1    /favoritos.html
+        App.Abrir Pagina    ${pagina}
+        App.Esperar Elementos    .page
+        App.Conferir Sem Estouro
+    END
+    App.Abrir Pagina    /series.html
+    Abro o primeiro título
+    App.Esperar Elementos    .cl-ep
+    App.Conferir Sem Estouro
+
+O texto não é menor que ${n} pixels
+    ${m}=    App.Menor Texto
+    Should Be True    ${m} >= ${n}
+
+A grade mostra ${n} colunas
+    ${c}=    App.Colunas Da Grade
+    Should Be Equal As Integers    ${c}    ${n}
+
+O carrossel "${titulo}" mostra ${n} itens por vez
+    ${c}=    App.Itens Visiveis No Carrossel    ${titulo}
+    Should Be Equal As Integers    ${c}    ${n}
+
+O conteúdo ocupa a largura toda da tela
+    ${p}=    App.Conteudo Ocupa A Largura
+    Should Be True    ${p} >= 99
+
+
 O vídeo está tocando
     App.Esperar Video Tocando    1
 

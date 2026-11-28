@@ -321,12 +321,25 @@
    * Mostra `perPage` itens por vez; setas ‹ › e bolinhas; quando o foco (setas do controle)
    * chega a um item fora da vista, o carrossel avança sozinho.
    */
+  /** Regime atual da tela (tv | tablet | phone); atualiza sozinho quando a tela muda (CL.layout). */
+  function useRegime() {
+    var st = React.useState(function () { return document.documentElement.getAttribute('data-layout') || 'tv'; });
+    React.useEffect(function () {
+      function f() { st[1](document.documentElement.getAttribute('data-layout') || 'tv'); }
+      window.addEventListener('cl-layout', f);
+      return function () { window.removeEventListener('cl-layout', f); };
+    }, []);
+    return st[0];
+  }
+
   function Carousel(props) {
-    var items = React.Children.toArray(props.children), per = props.perPage || 4;
+    var regime = useRegime();
+    var items = React.Children.toArray(props.children), per = window.CLRules.itensPorPagina(props.perPage || 4, regime);
     var pages = Math.max(1, Math.ceil(items.length / per));
     var st = React.useState(0), page = st[0], setPage = st[1];
     var vp = React.useRef(null);
     function ir(p) { setPage(Math.max(0, Math.min(pages - 1, p))); }
+    var toque = React.useRef(null);
     React.useEffect(function () {
       var el = vp.current; if (!el) return;
       var kids = el.firstChild ? el.firstChild.children : [];
@@ -352,11 +365,14 @@
           h('button', { type: 'button', tabIndex: -1, 'aria-label': 'Próximos', disabled: page === pages - 1, className: 'cl-carousel__btn', onClick: function () { ir(page + 1); } }, h(Icon, { name: 'next', size: 20 }))
         )
       ),
-      h('div', { className: 'cl-carousel__viewport', ref: vp, onFocus: aoFocar }, h('div', { className: 'cl-carousel__track' }, items))
+      h('div', { className: 'cl-carousel__viewport', ref: vp, onFocus: aoFocar,
+        onTouchStart: function (e) { toque.current = e.touches[0].clientX; },
+        onTouchEnd: function (e) { if (toque.current == null) return; var dx = e.changedTouches[0].clientX - toque.current; toque.current = null; if (Math.abs(dx) > 40) ir(page + (dx < 0 ? 1 : -1)); } }, h('div', { className: 'cl-carousel__track' }, items))
     );
   }
 
   window.CinemaLivre = {
+    useRegime: useRegime,
     Carousel: Carousel,
     DigitField: DigitField,
     NumericKeypad: NumericKeypad,
