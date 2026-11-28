@@ -68,20 +68,26 @@ class AppLib:
                 p.kill()
         self._procs = []
 
-    def abrir_contexto(self, largura=1280, altura=720):
-        """Navegador limpo (sem lista, sem perfil), como um aparelho novo."""
+    def abrir_contexto(self, largura=1280, altura=720, celular=False):
+        """Navegador limpo (sem login, sem lista), como um aparelho novo. `celular` liga toque e tela de celular."""
+        if self._ctx:  # trocou de aparelho no meio do cenário: fecha o anterior sem guardar evidência
+            try:
+                self._ctx.close()
+            except Exception:
+                pass
         self._videos = os.path.join(RAIZ, 'results', 'videos-tmp')
         tamanho = {'width': int(largura), 'height': int(altura)}
+        extra = {'has_touch': True, 'is_mobile': True, 'device_scale_factor': 2} if celular else {}
         try:
             if os.environ.get('APP_SEM_VIDEO'):
                 raise RuntimeError('sem video')
-            self._ctx = self._browser.new_context(viewport=tamanho, record_video_dir=self._videos)
+            self._ctx = self._browser.new_context(viewport=tamanho, record_video_dir=self._videos, **extra)
             self.page = self._ctx.new_page()
         except Exception:
             # sem o ffmpeg do Playwright não dá para gravar vídeo: segue só com print
             if self._ctx:
                 self._ctx.close()
-            self._ctx = self._browser.new_context(viewport=tamanho)
+            self._ctx = self._browser.new_context(viewport=tamanho, **extra)
             self.page = self._ctx.new_page()
         self._erros = []
         self.page.on('pageerror', lambda e: self._erros.append(str(e)))
@@ -190,6 +196,59 @@ class AppLib:
         """Mexe o mouse (no player, isso faz o cabeçalho com o botão Voltar reaparecer)."""
         self.page.mouse.move(300, 300)
         self.page.mouse.move(340, 320)
+
+    # ---------- responsividade ----------
+    def conferir_sem_estouro(self):
+        """A página não pode ser mais larga que a tela (sem barra de rolagem lateral)."""
+        self.page.wait_for_timeout(400)
+        r = self.page.evaluate("() => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth, url: location.pathname })")
+        if r['sw'] > r['iw'] + 1:
+            raise AssertionError(f"{r['url']}: conteúdo com {r['sw']}px passa da tela de {r['iw']}px")
+
+    def colunas_da_grade(self):
+        """Quantas colunas de pôsteres a grade mostra."""
+        self.page.wait_for_selector('.grid5 .cl-poster')
+        self.page.wait_for_timeout(300)
+        return self.page.evaluate("() => new Set([...document.querySelectorAll('.grid5 .cl-poster')].map(e => Math.round(e.getBoundingClientRect().left))).size")
+
+    def itens_visiveis_no_carrossel(self, titulo):
+        """Quantos itens do carrossel aparecem inteiros dentro da vista."""
+        self.page.wait_for_selector(f'section[aria-label="{titulo}"]')
+        self.page.wait_for_timeout(400)
+        return self.page.evaluate("""(t) => {
+            const vp = document.querySelector(`section[aria-label="${t}"] .cl-carousel__viewport`).getBoundingClientRect();
+            return [...document.querySelectorAll(`section[aria-label="${t}"] .cl-carousel__track > *`)]
+              .filter(e => { const r = e.getBoundingClientRect(); return r.left >= vp.left - 8 && r.right <= vp.right + 8; }).length;
+        }""", titulo)
+
+    def deslizar_carrossel(self, titulo, dx=-200):
+        """Desliza o dedo sobre o carrossel (toque de verdade, sem usar a seta)."""
+        self.page.evaluate("""([t, dx]) => {
+            const el = document.querySelector(`section[aria-label="${t}"] .cl-carousel__viewport`);
+            const mk = (x) => new Touch({ identifier: 1, target: el, clientX: x, clientY: 300 });
+            el.dispatchEvent(new TouchEvent('touchstart', { touches: [mk(300)], changedTouches: [mk(300)], bubbles: true }));
+            el.dispatchEvent(new TouchEvent('touchend', { touches: [], changedTouches: [mk(300 + dx)], bubbles: true }));
+        }""", [titulo, int(dx)])
+
+    def conteudo_ocupa_a_largura(self):
+        """Percentual da largura da tela que o conteúdo ocupa (na TV 4K deve ser ~100%)."""
+        self.page.wait_for_selector('.page')
+        self.page.wait_for_timeout(300)
+        return self.page.evaluate("() => document.querySelector('.page').getBoundingClientRect().width / window.innerWidth * 100")
+
+    def menor_texto(self):
+        """Menor tamanho de letra (px) entre os textos visíveis (vale para celular/tablet, sem ampliação)."""
+        self.page.wait_for_timeout(300)
+        return self.page.evaluate("""() => {
+            let min = 999;
+            for (const e of document.querySelectorAll('body *')) {
+                const tem = [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
+                const r = e.getBoundingClientRect();
+                if (!tem || r.width === 0 || r.height === 0 || getComputedStyle(e).visibility === 'hidden') continue;
+                min = Math.min(min, parseFloat(getComputedStyle(e).fontSize));
+            }
+            return min;
+        }""")
 
     def provedor_url(self):
         return self.provedor
