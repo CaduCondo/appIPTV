@@ -63,6 +63,8 @@ Cenário: Cliente não vê o botão Criar usuário e não abre a tela
     Quando abro a página "/criar-usuario.html"
     Então estou na página "home.html"
 
-Cenário: Administrador vê o botão Criar usuário na home
+Cenário: A home não tem o botão Criar usuário; o administrador o encontra no Perfil
     Dado que entrei pela demonstração com o perfil "Admin"
+    Então não vejo o texto "Criar usuário"
+    Quando toco no meu perfil
     Então vejo o texto "Criar usuário"

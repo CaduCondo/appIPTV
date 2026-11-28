@@ -1,6 +1,8 @@
 """Biblioteca de apoio dos testes Robot: sobe o app e o provedor de lista falso e controla o navegador."""
 import os
+import re
 import socket
+import unicodedata
 import subprocess
 import sys
 import time
@@ -174,6 +176,7 @@ class AppLib:
 
     def pagina_do_carrossel(self, titulo):
         """Número (1, 2, ...) da página mostrada no carrossel."""
+        self.page.wait_for_selector(f'section[aria-label="{titulo}"] .cl-carousel__dots i.on')
         return self.page.evaluate("""(t) => {
             const dots = [...document.querySelectorAll(`section[aria-label="${t}"] .cl-carousel__dots i`)];
             return dots.findIndex(d => d.classList.contains('on')) + 1;
@@ -249,6 +252,58 @@ class AppLib:
             }
             return min;
         }""")
+
+    # ---------- listagens ----------
+    @staticmethod
+    def _norm(t):
+        return ''.join(c for c in unicodedata.normalize('NFD', t) if unicodedata.category(c) != 'Mn').lower().strip()
+
+    def escolher_ordem(self, opcao):
+        self.page.wait_for_selector('select.cl-select__input')
+        self.page.locator('select.cl-select__input').select_option(label=opcao)
+        self.page.wait_for_timeout(300)
+
+    def titulos_da_grade(self):
+        self.page.wait_for_selector('.grid5 .cl-poster')
+        return [t.strip() for t in self.page.locator('.grid5 .cl-poster__title').all_inner_texts()]
+
+    def conferir_ordem_alfabetica(self, sentido):
+        """Os títulos da grade estão em ordem A–Z ('az') ou Z–A ('za') (sem ligar para acento e maiúscula)."""
+        nomes = [self._norm(t) for t in self.titulos_da_grade()]
+        esperado = sorted(nomes, reverse=(sentido == 'za'))
+        if nomes != esperado:
+            raise AssertionError(f'Fora de ordem ({sentido}): {nomes[:6]}...')
+
+    def rotulos_do_menu(self):
+        self.page.wait_for_selector('.cl-cat')
+        return [t.strip() for t in self.page.locator('.cl-cat').all_inner_texts()]
+
+    def conferir_ordem_do_menu(self):
+        """Fixos primeiro; depois gêneros A–Z; por último os streamings A–Z. Todo botão tem (N)."""
+        r = self.rotulos_do_menu()
+        fixos = ['Continuar assistindo (', 'Favoritos (', 'Adicionados recentemente (', 'Todos (']
+        for esperado, real in zip(fixos, r):
+            if not real.startswith(esperado):
+                raise AssertionError(f'Esperava "{esperado}" e achei "{real}"')
+        resto = r[4:]
+        if not all(re.search(r'\(\d[\d.]*\)$', x) for x in r):
+            raise AssertionError(f'Todo botão deve ter a contagem (N): {r}')
+        nomes = [re.sub(r'\s*\(\d[\d.]*\)$', '', x) for x in resto if not re.match(r'^\d{4}\b', x)]
+        streamings = [n for n in nomes if re.search(r'netflix|disney|apple tv|amc|hbo|prime|globoplay|paramount', n, re.I)]
+        generos = [n for n in nomes if n not in streamings]
+        if nomes != generos + streamings:
+            raise AssertionError(f'Streamings devem vir depois dos gêneros: {nomes}')
+        if generos != sorted(generos, key=self._norm) or streamings != sorted(streamings, key=self._norm):
+            raise AssertionError(f'Fora de ordem alfabética: gêneros={generos} streamings={streamings}')
+
+    def menu_tem_rolagem_propria(self):
+        self.page.wait_for_selector('.list__side')
+        return self.page.evaluate("""() => { const e = document.querySelector('.list__side'); const c = getComputedStyle(e);
+            return c.position === 'sticky' || ['auto', 'scroll'].includes(c.overflowY); }""")
+
+    def botao_selecionado_do_menu(self):
+        self.page.wait_for_selector('.cl-cat.is-active')
+        return self.page.locator('.cl-cat.is-active').first.inner_text().strip()
 
     def provedor_url(self):
         return self.provedor
