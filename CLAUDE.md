@@ -23,7 +23,7 @@
 
 ## Visão de engenharia (pedido do Cadu, 27/nov/2026)
 
-Processo de desenvolvimento muito bem feito, com as melhores ferramentas. Detalhe em `docs/PROCESSO.md`, `docs/SEGURANCA.md`, `docs/ARQUITETURA.md`, `docs/REGRAS_DE_NEGOCIO.md`, `docs/TESTES.md`.
+Processo de desenvolvimento muito bem feito, com as melhores ferramentas. Detalhe em `docs/PROCESSO.md`, `docs/SEGURANCA.md`, `docs/ARQUITETURA.md`, `docs/REGRAS_DE_NEGOCIO.md`, `docs/TESTES.md`, `docs/RESPONSIVIDADE.md`.
 
 - **Ferramentas:** GitHub (código, issues, Actions), Supabase (banco, login, RLS, funções), Vercel (hospedagem do site e funções; publica sozinha a versão aprovada). O Cadu já tem 2 projetos no Supabase e talvez não possa criar mais: se faltar, propor outra conta/e-mail ou outra ferramenta (decisão dele).
 - **Segurança em primeiro lugar** ("não pode ser invadido"): senhas só como hash, rotas de API com login, limite de tentativas, **RLS em toda tabela**, mensagem de erro de login **sempre igual** (nunca dizer se errou usuário ou senha), nenhum segredo no repositório (a senha do admin não entra em código, docs ou testes). Honestidade: nenhum sistema é 100% invulnerável; reduzimos risco em camadas e testamos sempre.
@@ -39,6 +39,7 @@ Processo de desenvolvimento muito bem feito, com as melhores ferramentas. Detalh
 - **Nunca barra de rolagem lateral:** onde a lista não cabe, usar **carrossel** (componente `Carousel`).
 - Layout simples, bonito e fácil de entender, juntando as melhores ideias de vários apps; foco nas 3 funções principais: **TV ao Vivo, Filmes, Séries**.
 - Nota sempre no formato "X,XX" (duas casas, vírgula).
+- **Totalmente responsivo** (pedido do Cadu, 28/nov/2026): o app roda em **TVs de vários tamanhos e em celulares/tablets de vários tamanhos**. Toda tela nova ou alterada tem de se encaixar em qualquer tamanho (regimes `tv`/`tablet`/`phone`, ver `docs/RESPONSIVIDADE.md`), sem barra de rolagem lateral e com alvos de toque de 44 px no celular. Teste no `09_responsivo.robot` (inclua a tela nova na lista de telas percorridas).
 
 ## Regra de conteúdo (importante)
 
@@ -106,7 +107,7 @@ O Cadu não vai ficar pedindo passo a passo. O Claude toca o backlog do início 
 - **Funcional/integração/regressão (BDD):** Robot Framework + Python/Playwright em `tests/robot/features/*.robot`, em português (Dado/Quando/Então), contra o app de verdade e um provedor de lista **falso** (`tests/mock/xtream_mock.py`).
   - Tag **`smoke`** = rápido e crítico (entrar, criar perfil, home). Roda primeiro. Poucos cenários.
   - Sem tag `smoke` = **regressão**: todo o resto. Só roda depois do smoke passar (`needs`).
-  - Tag por tela (`player`, `lista`, `login`, `usuarios`, `perfis`, `home`, `catalogo`, `demonstracao`) para rodar só uma: `python -m robot --include login tests/robot/features`.
+  - Tag por tela (`responsivo`, `player`, `lista`, `login`, `usuarios`, `perfis`, `home`, `catalogo`, `demonstracao`) para rodar só uma: `python -m robot --include login tests/robot/features`.
 - **Meta: 100% verde.** Todo vermelho tem causa medida (log, print, vídeo) — nunca "corrigir por dedução".
 - **Evidência:** cenário que passa guarda **print**; cenário que falha guarda **vídeo** e print em `results/` (o Actions anexa a pasta no relatório).
 - **GitHub Actions** (`.github/workflows/ci.yml`) roda tudo em todo push e Pull Request. Depois de cada push: conferir o resultado, comparar com o anterior e agir sozinho.

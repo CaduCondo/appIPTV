@@ -39,7 +39,7 @@ Para o BDD, uma vez: `pip install -r tests/robot/requirements.txt` e `python -m 
 |---|---|
 | `smoke` | Poucos cenários rápidos e críticos (cai no login, entra com usuário e senha, cria perfil e vê a home). Roda primeiro. |
 | (sem `smoke`) | **Regressão**: o resto. Só roda se o smoke passar. |
-| `player`, `lista`, `login`, `usuarios`, `perfis`, `home`, `catalogo`, `demonstracao` | Uma tag por assunto/tela. Ex.: `python -m robot --include catalogo tests/robot/features` |
+| `responsivo`, `player`, `lista`, `login`, `usuarios`, `perfis`, `home`, `catalogo`, `demonstracao` | Uma tag por assunto/tela. Ex.: `python -m robot --include catalogo tests/robot/features` |
 
 Cenário novo: exatamente uma rodada (smoke ou regressão) e a tag da tela. Vira `smoke` só se for rápido, confiável, criar o próprio dado e for crítico.
 
