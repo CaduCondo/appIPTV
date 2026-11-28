@@ -310,7 +310,7 @@
 
   /* ---------- navegação por setas (controle remoto) ---------- */
   function focusable() {
-    return [].slice.call(document.querySelectorAll('button:not([disabled]),[tabindex="0"],input,a[href]')).filter(function (el) {
+    return [].slice.call(document.querySelectorAll('button:not([disabled]),[tabindex="0"],input,select,a[href]')).filter(function (el) {
       var r = el.getBoundingClientRect();
       return r.width > 0 && r.height > 0 && r.bottom > -2000;
     });

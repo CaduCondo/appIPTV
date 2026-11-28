@@ -1,8 +1,8 @@
 /* Catálogo de demonstração: filmes abertos da Blender com vídeo de verdade + vitrine com pôsteres reais + títulos de exemplo. */
 CL.demoCatalog = function () {
   var A = 'assets/Demo/', G = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/', P = 'assets/Pessoas/';
-  var CATS = [['free', 'Cinema livre (com vídeo)'], ['lanc', 'Lançamentos'], ['acao', 'Ação'], ['comedia', 'Comédia'], ['drama', 'Drama'], ['ficcao', 'Ficção científica'], ['terror', 'Terror'], ['doc', 'Documentários']];
-  var GENRE = { free: 'Animação', lanc: 'Drama', acao: 'Ação, Aventura', comedia: 'Comédia', drama: 'Drama', ficcao: 'Ficção científica', terror: 'Terror, Suspense', doc: 'Documentário' };
+  var CATS = [['free', 'Cinema livre (com vídeo)'], ['lanc', 'Lançamentos'], ['acao', 'Ação'], ['comedia', 'Comédia'], ['drama', 'Drama'], ['ficcao', 'Ficção científica'], ['terror', 'Terror'], ['doc', 'Documentários'], ['nf', 'Netflix'], ['ds', 'Disney+'], ['ap', 'Apple TV+']];
+  var GENRE = { free: 'Animação', lanc: 'Drama', acao: 'Ação, Aventura', comedia: 'Comédia', drama: 'Drama', ficcao: 'Ficção científica', terror: 'Terror, Suspense', doc: 'Documentário', nf: 'Drama', ds: 'Aventura', ap: 'Drama' };
   var CAST = ['Ana Souza', 'Bruno Lima', 'Clara Reis', 'Diego Rocha', 'Elisa Prado', 'Fábio Dias', 'Gabriela Melo', 'Hugo Neves'];
   var n = 100;
   function cast(k) { return [0, 1, 2, 3].map(function (i) { return { name: CAST[(k + i) % CAST.length], character: '', img: '' }; }); }
@@ -33,7 +33,7 @@ CL.demoCatalog = function () {
     ['Cartas para Ninguém', 2023, 8.1, 'drama'], ['A Margem do Rio', 2022, 7.7, 'drama'], ['Silêncio de Inverno', 2020, 8.3, 'drama'], ['O Peso do Nome', 2018, 7.5, 'drama'],
     ['Órbita Zero', 2024, 7.6, 'ficcao'], ['Planeta Esquecido', 2021, 6.9, 'ficcao'], ['Código Delta', 2019, 7.2, 'ficcao'],
     ['A Casa dos Ecos', 2023, 6.5, 'terror'], ['Noite sem Fim', 2022, 6.0, 'terror'], ['O Porão', 2020, 6.8, 'terror'],
-    ['Planeta Azul Profundo', 2022, 8.0, 'doc'], ['Vozes da Floresta', 2021, 7.8, 'doc'], ['Cidades Invisíveis', 2019, 7.4, 'doc']
+    ['Noites de Vidro', 2024, 7.9, 'nf'], ['Ilha Sem Mapa', 2023, 7.2, 'nf'], ['O Jogo da Casa', 2025, 6.8, 'nf'], ['Reino das Marés', 2022, 8.1, 'ds'], ['Cavaleiros do Vale', 2021, 7.0, 'ds'], ['Órbita 9', 2024, 7.7, 'ap'], ['Planeta Azul Profundo', 2022, 8.0, 'doc'], ['Vozes da Floresta', 2021, 7.8, 'doc'], ['Cidades Invisíveis', 2019, 7.4, 'doc']
   ].forEach(function (m) { movie.push(mock(m[0], m[1], m[2], m[3])); });
 
   /* séries */

@@ -63,3 +63,16 @@ Registro do que foi pedido e decidido, em ordem. O Claude atualiza este arquivo 
 ## 28/nov/2026 — responsivo
 
 - O app deve ser **totalmente responsivo**: TVs de vários tamanhos e celulares de vários tamanhos, se encaixando na tela, qualquer que seja o tamanho (issue #43, `docs/RESPONSIVIDADE.md`).
+
+## 28/nov/2026 — pedidos de telas (home, listagens, detalhe, player, TV ao vivo)
+
+Registro fiel do que o Cadu pediu; o detalhe e os critérios em BDD estão nas issues e as regras em `docs/REGRAS_DE_NEGOCIO.md` (seções 11 a 16).
+
+- **Home** (#45, pronto): sem "Criar usuário"; carrosséis "Últimos filmes/séries adicionados" (~20), título-link para a lista com "Adicionados recentemente".
+- **Listagens** (#46, pronto): título, combo de ordenação, uma rolagem só, busca a partir da 3ª letra, menu com contagens (Continuar, Favoritos, Recentes 100, Todos, ano atual, ano anterior, gêneros A–Z, streamings A–Z). Em todas as telas de lista, combo de ordenação no canto superior direito.
+- **Detalhe do filme/série** (#47): player pequeno que começa sozinho, botões-filtro, Assistir/Voltar a assistir/Assistir novamente, Favorito vermelho, sem Relacionadas/Ouvir. A série mantém o bloco de temporadas e episódios, que não pode ser afetado.
+- **Player cheio** (#48): barra de tempo com prévia da cena, menu pela seta ↓, áudio e legendas (prints de referência).
+- **Avaliação** (#49): 10 estrelas no fim do filme, entra na nota do título.
+- **TV ao Vivo** (#50, #51, #52): colunas em cascata, guia de programação (7 dias atrás e à frente), assistir passado, agendar futuro, qualidade automática ou manual.
+- **Decisão do Claude:** o botão de coração será um ícone vermelho (o app não usa emoji).
+- **Segurança:** o Cadu colou códigos de backup do Vercel no chat; orientado a gerar novos. Nunca guardados.

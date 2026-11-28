@@ -14,7 +14,7 @@ Cenário: Criar o primeiro perfil abre a home com saudação
     [Tags]    smoke
     Dado que entrei com a lista de teste e o perfil "CaDu"
     Então vejo o texto "TV ao Vivo"
-    E vejo o texto "Últimos adicionados"
+    E vejo o texto "Últimos filmes adicionados"
     E a página não tem erros de script
 
 Cenário: A home mostra as seções com a contagem da lista

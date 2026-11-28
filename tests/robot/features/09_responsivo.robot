@@ -64,10 +64,10 @@ Cenário: Na TV Full HD as categorias ficam ao lado e a grade tem 5 colunas
 Cenário: No celular o carrossel mostra poucos itens e desliza com o dedo
     Dado que estou num celular de 390x844
     E que entrei como cliente com o perfil "Ana"
-    Então o carrossel "Últimos adicionados" mostra 2 itens por vez
-    E o carrossel "Últimos adicionados" está na página 1
-    Quando deslizo o dedo no carrossel "Últimos adicionados"
-    Então o carrossel "Últimos adicionados" está na página 2
+    Então o carrossel "Últimos filmes adicionados" mostra 2 itens por vez
+    E o carrossel "Últimos filmes adicionados" está na página 1
+    Quando deslizo o dedo no carrossel "Últimos filmes adicionados"
+    Então o carrossel "Últimos filmes adicionados" está na página 2
 
 Cenário: Na TV 4K o conteúdo ocupa a tela toda
     Dado que estou num aparelho de 3840x2160

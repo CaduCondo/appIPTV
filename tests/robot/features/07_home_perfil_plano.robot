@@ -18,19 +18,20 @@ Cenário: A home destaca TV ao Vivo, Filmes e Séries
 
 Cenário: A home não tem barra de rolagem lateral
     Dado que entrei como cliente com o perfil "Ana"
-    Então vejo o texto "Últimos adicionados"
+    Então vejo o texto "Últimos filmes adicionados"
     E nenhum bloco tem barra de rolagem lateral
 
-Cenário: Últimos adicionados mostra a etiqueta Filme ou Série e a nota X,XX
+Cenário: Últimos filmes e séries mostram a etiqueta e a nota X,XX
     Dado que entrei como cliente com o perfil "Ana"
-    Então vejo as etiquetas Filme e Série em "Últimos adicionados"
-    E as notas de "Últimos adicionados" estão no formato X,XX
+    Então vejo a etiqueta "Filme" em "Últimos filmes adicionados"
+    E vejo a etiqueta "Série" em "Últimas séries adicionadas"
+    E as notas de "Últimos filmes adicionados" estão no formato X,XX
 
 Cenário: O carrossel avança de página
     Dado que entrei como cliente com o perfil "Ana"
-    Então o carrossel "Últimos adicionados" está na página 1
-    Quando toco em Próximos no carrossel "Últimos adicionados"
-    Então o carrossel "Últimos adicionados" está na página 2
+    Então o carrossel "Últimos filmes adicionados" está na página 1
+    Quando toco em Próximos no carrossel "Últimos filmes adicionados"
+    Então o carrossel "Últimos filmes adicionados" está na página 2
 
 Cenário: Jogo que ainda não começou mostra o horário
     Dado que entrei como cliente com o perfil "Ana"

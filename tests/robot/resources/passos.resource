@@ -143,7 +143,6 @@ Escolho a categoria "${categoria}"
     App.Clicar No Elemento    .cl-cat:has-text("${categoria}")
 
 Busco por "${texto}"
-    App.Clicar No Botao    Buscar
     App.Preencher Campo    0    ${texto}
 
 Abro o primeiro título
@@ -157,6 +156,27 @@ Escolho a temporada "${nome}"
     App.Clicar No Elemento    .cl-season:has-text("${nome}")
 
 # ---------- Então ----------
+Escolho a ordem "${opcao}"
+    App.Escolher Ordem    ${opcao}
+
+Os títulos estão em ordem ${sentido}
+    App.Conferir Ordem Alfabetica    ${sentido}
+
+O menu segue a ordem pedida
+    App.Conferir Ordem Do Menu
+
+O menu não tem barra de rolagem própria
+    ${r}=    App.Menu Tem Rolagem Propria
+    Should Not Be True    ${r}
+
+O botão selecionado do menu é "${texto}"
+    ${b}=    App.Botao Selecionado Do Menu
+    Should Start With    ${b}    ${texto}
+
+Toco no título "${texto}"
+    App.Clicar No Elemento    a.cl-carousel__link:has-text("${texto}")
+
+
 Percorro todas as telas e nada passa da largura
     App.Abrir Pagina    /entrar.html
     App.Conferir Sem Estouro
@@ -222,6 +242,10 @@ As notas de "${titulo}" estão no formato X,XX
     FOR    ${nota}    IN    @{notas}
         Should Match Regexp    ${nota}    ^\\d,\\d{2}$
     END
+
+Vejo a etiqueta "${etiqueta}" em "${titulo}"
+    ${tags}=    App.Textos    section[aria-label="${titulo}"] .cl-flag
+    Should Contain    ${tags}    ${etiqueta}
 
 Vejo as etiquetas Filme e Série em "${titulo}"
     ${tags}=    App.Textos    section[aria-label="${titulo}"] .cl-flag

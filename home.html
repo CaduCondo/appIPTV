@@ -39,8 +39,7 @@ function App() {
 
   var hist = CL.history().slice(0, 12);
   var rec = meta.recent || {};
-  var ultimos = [].concat((rec.movie || []).map(function (x) { return { t: 'movie', x: x }; }), (rec.series || []).map(function (x) { return { t: 'series', x: x }; }))
-    .sort(function (a, b) { return (b.x.a || 0) - (a.x.a || 0); }).slice(0, 20);
+  var filmes = (rec.movie || []).slice(0, 20), series = (rec.series || []).slice(0, 20);
   var jogos = DEMO ? jogosDeExemplo() : [];
 
   function abrirJogo(j) {
@@ -59,7 +58,6 @@ function App() {
         h('div', { className: 'muted', style: { font: '600 16px/22px var(--font-sans)' } }, CL.greeting() + ', ' + prof.name + ' · ' + st.now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' + st.now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }))),
       h('div', { className: 'btns', style: { alignItems: 'center' } },
         DEMO && h('span', { className: 'badge-demo' }, 'Demonstração'),
-        CL.isAdmin() && h(C.ActionButton, { variant: 'primary', icon: 'plus', onClick: function () { location.href = 'criar-usuario.html'; } }, 'Criar usuário'),
         h(C.ProfileItem, { name: prof.name, color: prof.color, onClick: function () { location.href = 'perfil.html'; } }))),
 
     h('div', { className: 'hub3' },
@@ -67,9 +65,14 @@ function App() {
       h(C.HubTile, { icon: 'film', title: 'Filmes', subtitle: CL.num(counts.movie) + ' títulos', onClick: function () { location.href = 'filmes.html'; } }),
       h(C.HubTile, { icon: 'series', title: 'Séries', subtitle: CL.num(counts.series) + ' séries', onClick: function () { location.href = 'series.html'; } })),
 
-    ultimos.length > 0 && h('div', { className: 'bloco' },
-      h(C.Carousel, { titulo: 'Últimos adicionados', perPage: 6 }, ultimos.map(function (r) {
-        return h(C.PosterCard, { key: r.t + r.x.id, title: r.x.n, year: r.x.y || undefined, rating: r.x.r || undefined, src: r.x.p, kind: r.t === 'movie' ? 'Filme' : 'Série', onClick: function () { location.href = 'detalhe.html?t=' + r.t + '&id=' + encodeURIComponent(r.x.id); } });
+    filmes.length > 0 && h('div', { className: 'bloco' },
+      h(C.Carousel, { titulo: 'Últimos filmes adicionados', tituloHref: 'filmes.html?c=new', perPage: 6 }, filmes.map(function (x) {
+        return h(C.PosterCard, { key: x.id, title: x.n, year: x.y || undefined, rating: x.r || undefined, src: x.p, kind: 'Filme', onClick: function () { location.href = 'detalhe.html?t=movie&id=' + encodeURIComponent(x.id); } });
+      }))),
+
+    series.length > 0 && h('div', { className: 'bloco' },
+      h(C.Carousel, { titulo: 'Últimas séries adicionadas', tituloHref: 'series.html?c=new', perPage: 6 }, series.map(function (x) {
+        return h(C.PosterCard, { key: x.id, title: x.n, year: x.y || undefined, rating: x.r || undefined, src: x.p, kind: 'Série', onClick: function () { location.href = 'detalhe.html?t=series&id=' + encodeURIComponent(x.id); } });
       }))),
 
     hist.length > 0 && h('div', { className: 'bloco' },
