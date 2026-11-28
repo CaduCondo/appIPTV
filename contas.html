@@ -30,7 +30,7 @@ function App() {
   return h('div', null,
     h('div', { className: 'topbar' }, h('h1', { className: 'h-title' }, 'Contas'), h('div', { className: 'btns' }, h(C.ActionButton, { icon: 'home', onClick: function () { location.href = CL.profile() ? 'home.html' : 'perfis.html'; } }, 'Início'))),
     h('div', { className: 'hello', style: { flexDirection: 'column', alignItems: 'stretch', maxWidth: 760, gap: 10 } },
-      rows.map(function (r) { return h('div', { key: r[0], style: { display: 'flex', gap: 16 } }, h('span', { className: 'muted', style: { width: 180, font: '600 16px/22px var(--font-sans)' } }, r[0]), h('span', { style: { font: '500 18px/24px var(--font-sans)', wordBreak: 'break-all' } }, r[1])); })),
+      rows.map(function (r) { return h('div', { key: r[0], style: { display: 'flex', gap: 16, flexWrap: 'wrap' } }, h('span', { className: 'muted', style: { flex: '0 0 180px', font: '600 16px/22px var(--font-sans)' } }, r[0]), h('span', { style: { font: '500 18px/24px var(--font-sans)', wordBreak: 'break-all' } }, r[1])); })),
     h('div', { style: { margin: '16px 0', maxWidth: 760 } }, st.err && h('div', { className: 'msg err' }, st.err), st.msg && !st.err && h('div', { className: 'msg' }, st.msg)),
     h('div', { className: 'btns' },
       CL.isAdmin() && h(C.ActionButton, { variant: 'primary', icon: 'refresh', onClick: reload }, 'Atualizar lista'),

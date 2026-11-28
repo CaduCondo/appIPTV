@@ -1,6 +1,7 @@
 html, body { margin: 0; background: var(--surface-100); color: var(--ink); font-family: var(--font-sans); }
 body { min-height: 100vh; }
-.page { box-sizing: border-box; width: 1280px; padding: 32px; }
+.page { box-sizing: border-box; width: 100%; padding: 32px; }
+html[data-layout="tv"] .page { width: 1280px; }
 h1, h2, h3 { margin: 0; }
 .h-title { font: 700 40px/44px var(--font-display); }
 .h-xl { font: 700 56px/60px var(--font-display); }
@@ -14,7 +15,7 @@ h1, h2, h3 { margin: 0; }
 .msg.ok { border-color: var(--brand); }
 .brand-mark { font: 700 28px/32px var(--font-display); letter-spacing: -0.01em; }
 .brand-mark b { color: var(--brand); }
-.topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
 .badge-demo { display: inline-block; padding: 3px 10px; border-radius: var(--radius-pill); background: var(--accent); color: var(--on-accent); font: 700 12px/16px var(--font-sans); }
 
 /* login / perfis: mosaico de pôsteres ao fundo */
@@ -26,12 +27,12 @@ h1, h2, h3 { margin: 0; }
 
 /* login */
 .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
-.form { display: flex; flex-direction: column; gap: 14px; width: 460px; }
+.form { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 460px; }
 .devcode { position: fixed; left: 32px; bottom: 16px; z-index: 3; font: 500 14px/18px var(--font-sans); color: var(--ink-muted); }
 textarea.cl-field__input { min-height: 120px; font: 400 14px/18px monospace; resize: vertical; }
 
 /* perfis */
-.profiles { display: flex; flex-direction: column; gap: 8px; width: 480px; margin-top: 16px; }
+.profiles { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 480px; margin-top: 16px; }
 .swatches { display: flex; gap: 8px; }
 .swatch { width: 44px; height: 44px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; padding: 0; }
 .swatch.is-on { border-color: var(--ink); }
@@ -96,7 +97,7 @@ body.player { background: #000; }
 .entrar__card { display: flex; flex-direction: column; gap: 12px; justify-content: center; padding: 32px 40px; background: var(--surface-100); }
 .entrar__card h1 { font: 700 36px/40px var(--font-display); }
 .entrar__aviso { margin-top: 4px; font: 500 14px/20px var(--font-sans); color: var(--ink-muted); }
-.stepper { display: flex; gap: 8px; margin: 8px 0 20px; }
+.stepper { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 20px; }
 .stepper span { padding: 4px 12px; border-radius: var(--radius-pill); border: 2px solid var(--line-strong); font: 600 14px/18px var(--font-sans); color: var(--ink-muted); }
 .stepper span.on { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
 .choices { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; max-width: 900px; }
@@ -120,3 +121,67 @@ body.player { background: #000; }
 .bloco { margin-top: 26px; }
 .bloco .cl-carousel__title { font-size: 14px; }
 .plano { display: grid; grid-template-columns: 420px 1fr; gap: 32px; align-items: start; }
+
+/* =====================================================================
+   RESPONSIVIDADE (issue #43)
+   <html data-layout="tv|tablet|phone"> é definido por CL.layout (js/app.js).
+   tv: desenho de 1280 px ampliado para a tela · tablet/phone: layout fluido.
+   ===================================================================== */
+.choices.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.hub4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* alvos de toque de pelo menos 44 px fora da TV */
+html:not([data-layout="tv"]) .cl-btn,
+html:not([data-layout="tv"]) .cl-cat,
+html:not([data-layout="tv"]) .cl-season,
+html:not([data-layout="tv"]) .cl-key,
+html:not([data-layout="tv"]) .cl-carousel__btn { min-height: 44px; }
+html:not([data-layout="tv"]) .cl-carousel__btn { min-width: 44px; }
+html:not([data-layout="tv"]) .devcode { position: static; padding: 8px 16px 16px; }
+html:not([data-layout="tv"]) .list { grid-template-columns: minmax(0, 1fr); }
+html:not([data-layout="tv"]) .list__side { position: static; max-height: none; overflow: visible; margin-bottom: 12px; }
+html:not([data-layout="tv"]) .plano { grid-template-columns: minmax(0, 1fr); }
+
+/* tablet */
+html[data-layout="tablet"] .page { padding: 24px; }
+html[data-layout="tablet"] .grid5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+html[data-layout="tablet"] .choices { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+html[data-layout="tablet"] .choices.five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+html[data-layout="tablet"] .featured { max-width: 260px; right: 24px; bottom: 16px; }
+html[data-layout="tablet"] .featured .t { font-size: 26px; line-height: 30px; }
+html[data-layout="tablet"] .entrar { grid-template-columns: minmax(0, 1fr) 420px; }
+html[data-layout="tablet"] .entrar__brand .name { font-size: 52px; line-height: 54px; }
+
+/* celular */
+html[data-layout="phone"] .page { padding: 16px; }
+html[data-layout="phone"] .h-title { font-size: 28px; line-height: 34px; }
+html[data-layout="phone"] .h-xl { font-size: 32px; line-height: 38px; }
+html[data-layout="phone"] .h-sec { font-size: 22px; line-height: 28px; }
+html[data-layout="phone"] .plot { font-size: 17px; line-height: 26px; }
+html[data-layout="phone"] .brand-mark { font-size: 24px; line-height: 28px; }
+html[data-layout="phone"] .grid5 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 8px; }
+html[data-layout="phone"] .choices, html[data-layout="phone"] .choices.three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+html[data-layout="phone"] .choices.two { grid-template-columns: minmax(0, 1fr); }
+html[data-layout="phone"] .choices.five { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+html[data-layout="phone"] .choice { padding: 12px; }
+html[data-layout="phone"] .choice b { font-size: 18px; line-height: 22px; }
+html[data-layout="phone"] .hub3, html[data-layout="phone"] .hub4 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+html[data-layout="phone"] .hub3 > :first-child { grid-column: 1 / -1; }
+html[data-layout="phone"] .hub3 .cl-hub, html[data-layout="phone"] .hub3 .cl-hub--big { min-height: 104px; padding: 14px; }
+html[data-layout="phone"] .hub3 .cl-hub__title { font-size: 22px; line-height: 28px; }
+html[data-layout="phone"] .detail-top { grid-template-columns: minmax(0, 1fr); row-gap: 16px; }
+html[data-layout="phone"] .detail-poster { max-width: 150px; }
+html[data-layout="phone"] .result .big { font-size: 30px; line-height: 36px; }
+html[data-layout="phone"] .stage__bg { grid-template-columns: repeat(3, 1fr); }
+html[data-layout="phone"] .featured { display: none; }
+html[data-layout="phone"] .match__score { font-size: 18px; }
+html[data-layout="phone"] .entrar { display: flex; flex-direction: column; min-height: 100vh; }
+html[data-layout="phone"] .entrar__hero { min-height: 150px; padding: 20px 16px 8px; flex: none; }
+html[data-layout="phone"] .entrar__brand .name { font-size: 40px; line-height: 42px; }
+html[data-layout="phone"] .entrar__brand p { font-size: 16px; line-height: 22px; margin-top: 4px; }
+html[data-layout="phone"] .entrar__card { padding: 12px 16px 24px; flex: 1; }
+html[data-layout="phone"] .entrar__card h1 { font-size: 28px; line-height: 32px; }
+html[data-layout="phone"] .cl-digits__value { font-size: 26px; line-height: 32px; }
+html[data-layout="phone"] .cl-key { height: 54px; }
+html[data-layout="phone"] .cl-carousel__title { font-size: 12px; }
+html[data-layout="phone"] .wide-card { height: 120px; }

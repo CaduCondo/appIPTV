@@ -275,15 +275,29 @@
     CL.startHeartbeat();
     return true;
   };
-  CL.fit = function () {
-    var z = window.innerWidth / 1280;
+  /**
+   * Responsividade: escolhe o regime da tela (tv | tablet | phone, ver CLRules.regimeDeTela),
+   * marca em <html data-layout="..."> (o CSS usa isso) e, só na TV, amplia o desenho de 1280 px.
+   */
+  CL.layout = function () {
+    var R = window.CLRules, w = window.innerWidth, hgt = window.innerHeight;
+    var regime = R.regimeDeTela(w, hgt), z = regime === 'tv' ? R.fatorDeZoom(w) : 1;
+    var antes = document.documentElement.getAttribute('data-layout');
+    document.documentElement.setAttribute('data-layout', regime);
     document.documentElement.style.setProperty('--z', z);
     var els = document.querySelectorAll('.page');
-    for (var i = 0; i < els.length; i++) { els[i].style.zoom = z; els[i].style.minHeight = window.innerHeight / z + 'px'; }
+    for (var i = 0; i < els.length; i++) {
+      els[i].style.zoom = regime === 'tv' ? z : '';
+      els[i].style.minHeight = (hgt / z) + 'px';
+    }
+    if (antes !== regime) window.dispatchEvent(new Event('cl-layout'));
   };
-  window.addEventListener('resize', CL.fit);
-  document.addEventListener('DOMContentLoaded', CL.fit);
-  window.addEventListener('load', CL.fit);
+  CL.fit = CL.layout;
+  CL.layout();
+  window.addEventListener('resize', CL.layout);
+  window.addEventListener('orientationchange', CL.layout);
+  document.addEventListener('DOMContentLoaded', CL.layout);
+  window.addEventListener('load', CL.layout);
 
   CL.greeting = function () {
     var h = new Date().getHours();
