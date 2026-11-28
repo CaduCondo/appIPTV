@@ -73,3 +73,38 @@ Fonte da verdade do que o sistema deve fazer, em linguagem simples. Mudou uma re
 - **Retomar:** filme e episódio voltam de onde pararam, só se já passou de 2 segundos e não está nos últimos 10 segundos. O botão vira **Continuar**.
 - **Ao vivo:** as setas ↑ ↓ trocam de canal dentro da mesma categoria, dando a volta nas pontas.
 - No player: ← → pulam 10 s, espaço/Enter pausa, Esc/Voltar sai. O cabeçalho some depois de 3 s e volta ao mexer no mouse ou apertar uma tecla.
+
+## 11. Listagens (Filmes, Séries, TV ao Vivo) — pronto
+
+- Título em maiúsculas no topo esquerdo (**FILMES**, **SÉRIES**, **TV AO VIVO**) e, no topo direito, o combo **Ordenar**: De A até Z, De Z até A, Data de lançamento (mais novo primeiro; sem data por último), Melhor nota, Adicionados recentemente. Vale para todas as listas.
+- **Uma barra de rolagem só:** o menu da esquerda e os títulos da direita rolam juntos; quando uma coluna termina, a outra continua.
+- **Buscar:** só filtra a partir da **3ª letra** e procura em **qualquer parte do nome**, sem ligar para acento ou maiúscula ("amo" acha "Amor te amo", "amorzinho", "eu falei amor").
+- **Menu, nesta ordem, cada botão com a contagem "(N)":** Continuar assistindo · Favoritos · Adicionados recentemente (os últimos 100) · Todos · ano atual (até 100) · ano anterior (até 100) · gêneros em ordem alfabética · streamings em ordem alfabética (AMC+, Apple TV+, Disney+, Netflix...). Botão sem título dentro não aparece.
+- Um título com mais de um gênero aparece em todos (depende da base de catálogo, issue #7; a lista do provedor traz uma categoria só).
+
+## 12. Home — pronto
+
+- Sem botão **Criar usuário** (fica em Perfil, só administrador).
+- Carrosséis **Últimos filmes adicionados** e **Últimas séries adicionadas** (até 20 títulos): o título é um link para a lista com **Adicionados recentemente** selecionado.
+
+## 13. Detalhe do filme/série — a fazer (issue #47)
+
+- A tela é **a mesma para filme e série**; a série tem **um bloco a mais** (temporadas e episódios) que não muda com as regras abaixo.
+- Sem pôster no topo esquerdo (a imagem vira fundo transparente; textos nunca transparentes). **Janela de player** no topo direito que começa sozinha (do começo ou de onde parou); tocar nela abre a **tela cheia**; faixa de progresso embaixo.
+- Botões abaixo do título são **filtros**: gênero → lista do gênero; data **DD-MM-AAAA** → lista do ano; nota **⭐ X,XX** → títulos com o mesmo primeiro dígito da nota.
+- **Assistir** (nunca começou) · **Voltar a assistir** (começou: abre dica com "Voltar a assistir" e "Começar novamente") · **Assistir novamente** (terminou). O progresso só é gravado em **tela cheia**.
+- **Favorito** vira **Desfavoritar** com coração vermelho. Sem Relacionadas e sem Ouvir.
+
+## 14. Player em tela cheia — a fazer (issue #48)
+
+- Seta ↓ mostra a barra de tempo (atual e total), título e opções; ao avançar mostra **prévia da cena**. Configurações: áudio, legenda (ligar/desligar, idioma, tempo, tamanho Normal/Grande/Pequeno, estilo).
+
+## 15. Avaliação no fim do filme — a fazer (issue #49)
+
+- No fim aparece uma telinha pequena: **"Qual sua nota?"** com 10 estrelas (setas, mouse ou toque; cada estrela sobe e fica amarela). A nota entra na conta da nota do título.
+
+## 16. TV ao Vivo nova — a fazer (issues #50, #51, #52)
+
+- Colunas que abrem para a direita conforme o foco: tipos de canal → canais → programação do canal → dias (7 atrás a 7 à frente) → horários do dia (início, fim, título, sinopse). Busca que filtra a cada letra, lista de favoritos e de agendados.
+- Programa passado (até 7 dias): dá para assistir. Ao vivo: ↓ mostra título, sinopse, início/fim, barra de porcentagem e Favoritar/Desfavoritar. Futuro: agenda.
+- **Qualidade:** em Configurações o usuário escolhe **Automático** (sempre a melhor que não trava, baixando sozinho se a internet não aguentar) ou **Manual** (↓ mostra as qualidades: SD, HD, FHD, 4K, 8K...).
